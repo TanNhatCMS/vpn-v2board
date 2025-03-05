@@ -30,7 +30,7 @@ return new class extends Migration
             $table->integer('last_login_at')->nullable()->after('is_admin');
             $table->tinyInteger('is_staff')->default(0)->after('last_login_at');
             $table->integer('last_login_ip')->nullable()->after('is_staff');
-            $table->uuid('uuid')->unique()->after('last_login_ip');
+            $table->uuid()->unique()->after('last_login_ip');
             $table->integer('group_id')->nullable()->after('uuid');
             $table->integer('plan_id')->nullable()->after('group_id');
             $table->integer('speed_limit')->nullable()->after('plan_id');
