@@ -25,7 +25,7 @@ class UserUpdate extends FormRequest
             'u' => 'integer',
             'd' => 'integer',
             'balance' => 'integer',
-            'commission_balance' => 'integer'
+            'commission_balance' => 'integer',
         ];
     }
 
@@ -50,7 +50,7 @@ class UserUpdate extends FormRequest
             'u.integer' => '上行流量格式不正确',
             'd.integer' => '下行流量格式不正确',
             'balance.integer' => '余额格式不正确',
-            'commission_balance.integer' => '佣金格式不正确'
+            'commission_balance.integer' => '佣金格式不正确',
         ];
     }
 }

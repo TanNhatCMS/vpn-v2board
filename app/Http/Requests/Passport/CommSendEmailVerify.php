@@ -14,7 +14,7 @@ class CommSendEmailVerify extends FormRequest
     public function rules()
     {
         return [
-            'email' => 'required|email:strict'
+            'email' => 'required|email:strict',
         ];
     }
 
@@ -22,7 +22,7 @@ class CommSendEmailVerify extends FormRequest
     {
         return [
             'email.required' => __('Email can not be empty'),
-            'email.email' => __('Email format is incorrect')
+            'email.email' => __('Email format is incorrect'),
         ];
     }
 }

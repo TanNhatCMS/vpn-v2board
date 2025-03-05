@@ -24,7 +24,7 @@ class CouponGenerate extends FormRequest
             'limit_use_with_user' => 'nullable|integer',
             'limit_plan_ids' => 'nullable|array',
             'limit_period' => 'nullable|array',
-            'code' => ''
+            'code' => '',
         ];
     }
 
@@ -45,7 +45,7 @@ class CouponGenerate extends FormRequest
             'limit_use.integer' => '最大使用次数格式有误',
             'limit_use_with_user.integer' => '限制用户使用次数格式有误',
             'limit_plan_ids.array' => '指定订阅格式有误',
-            'limit_period.array' => '指定周期格式有误'
+            'limit_period.array' => '指定周期格式有误',
         ];
     }
 }

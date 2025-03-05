@@ -15,7 +15,7 @@ class UserUpdate extends FormRequest
     {
         return [
             'remind_expire' => 'in:0,1',
-            'remind_traffic' => 'in:0,1'
+            'remind_traffic' => 'in:0,1',
         ];
     }
 
@@ -23,7 +23,7 @@ class UserUpdate extends FormRequest
     {
         return [
             'show.in' => __('Incorrect format of expiration reminder'),
-            'renew.in' => __('Incorrect traffic alert format')
+            'renew.in' => __('Incorrect traffic alert format'),
         ];
     }
 }

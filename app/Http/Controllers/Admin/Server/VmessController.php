@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers\Admin\Server;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ServerVmessSave;
 use App\Http\Requests\Admin\ServerVmessUpdate;
-use App\Services\ServerService;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use App\Models\ServerVmess;
+use Illuminate\Http\Request;
 
 class VmessController extends Controller
 {
@@ -17,7 +16,7 @@ class VmessController extends Controller
 
         if ($request->input('id')) {
             $server = ServerVmess::find($request->input('id'));
-            if (!$server) {
+            if (! $server) {
                 abort(500, '服务器不存在');
             }
             try {
@@ -25,17 +24,18 @@ class VmessController extends Controller
             } catch (\Exception $e) {
                 abort(500, '保存失败');
             }
+
             return response([
-                'data' => true
+                'data' => true,
             ]);
         }
 
-        if (!ServerVmess::create($params)) {
+        if (! ServerVmess::create($params)) {
             abort(500, '创建失败');
         }
 
         return response([
-            'data' => true
+            'data' => true,
         ]);
     }
 
@@ -43,12 +43,13 @@ class VmessController extends Controller
     {
         if ($request->input('id')) {
             $server = ServerVmess::find($request->input('id'));
-            if (!$server) {
+            if (! $server) {
                 abort(500, '节点ID不存在');
             }
         }
+
         return response([
-            'data' => $server->delete()
+            'data' => $server->delete(),
         ]);
     }
 
@@ -60,7 +61,7 @@ class VmessController extends Controller
 
         $server = ServerVmess::find($request->input('id'));
 
-        if (!$server) {
+        if (! $server) {
             abort(500, '该服务器不存在');
         }
         try {
@@ -70,7 +71,7 @@ class VmessController extends Controller
         }
 
         return response([
-            'data' => true
+            'data' => true,
         ]);
     }
 
@@ -78,15 +79,15 @@ class VmessController extends Controller
     {
         $server = ServerVmess::find($request->input('id'));
         $server->show = 0;
-        if (!$server) {
+        if (! $server) {
             abort(500, '服务器不存在');
         }
-        if (!ServerVmess::create($server->toArray())) {
+        if (! ServerVmess::create($server->toArray())) {
             abort(500, '复制失败');
         }
 
         return response([
-            'data' => true
+            'data' => true,
         ]);
     }
 }

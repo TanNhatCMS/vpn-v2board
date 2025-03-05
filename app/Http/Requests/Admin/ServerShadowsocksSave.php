@@ -26,7 +26,7 @@ class ServerShadowsocksSave extends FormRequest
             'obfs' => 'nullable|in:http',
             'obfs_settings' => 'nullable|array',
             'tags' => 'nullable|array',
-            'rate' => 'required|numeric'
+            'rate' => 'required|numeric',
         ];
     }
 
@@ -46,7 +46,7 @@ class ServerShadowsocksSave extends FormRequest
             'rate.required' => '倍率不能为空',
             'rate.numeric' => '倍率格式不正确',
             'obfs.in' => '混淆格式不正确',
-            'obfs_settings.array' => '混淆设置格式不正确'
+            'obfs_settings.array' => '混淆设置格式不正确',
         ];
     }
 }

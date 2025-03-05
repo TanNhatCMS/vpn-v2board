@@ -25,7 +25,7 @@ class ServerTrojanSave extends FormRequest
             'allow_insecure' => 'nullable|in:0,1',
             'server_name' => 'nullable',
             'tags' => 'nullable|array',
-            'rate' => 'required|numeric'
+            'rate' => 'required|numeric',
         ];
     }
 
@@ -43,7 +43,7 @@ class ServerTrojanSave extends FormRequest
             'allow_insecure.in' => '允许不安全格式不正确',
             'tags.array' => '标签格式不正确',
             'rate.required' => '倍率不能为空',
-            'rate.numeric' => '倍率格式不正确'
+            'rate.numeric' => '倍率格式不正确',
         ];
     }
 }
