@@ -101,7 +101,6 @@ class ResetTraffic extends Command
                     $builder = with(clone $this->builder)->whereIn('plan_id', $planIds);
                     $this->resetByExpireYear($builder);
                     break;
-
             }
         }
     }
