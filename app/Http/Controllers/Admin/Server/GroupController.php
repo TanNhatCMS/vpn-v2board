@@ -20,7 +20,7 @@ class GroupController extends Controller
             ]);
         }
         $serverGroups = ServerGroup::get();
-        $serverService = new ServerService();
+        $serverService = new ServerService;
         $servers = $serverService->getAllServers();
         foreach ($serverGroups as $k => $v) {
             $serverGroups[$k]['user_count'] = User::where('group_id', $v['id'])->count();
@@ -40,13 +40,13 @@ class GroupController extends Controller
     public function save(Request $request)
     {
         if (empty($request->input('name'))) {
-            abort(500, '组名不能为空');
+            abort(500, 'Tên nhóm không được để trống');
         }
 
         if ($request->input('id')) {
             $serverGroup = ServerGroup::find($request->input('id'));
         } else {
-            $serverGroup = new ServerGroup();
+            $serverGroup = new ServerGroup;
         }
 
         $serverGroup->name = $request->input('name');
@@ -61,22 +61,22 @@ class GroupController extends Controller
         if ($request->input('id')) {
             $serverGroup = ServerGroup::find($request->input('id'));
             if (! $serverGroup) {
-                abort(500, '组不存在');
+                abort(500, 'Nhóm không tồn tại');
             }
         }
 
         $servers = ServerVmess::all();
         foreach ($servers as $server) {
             if (in_array($request->input('id'), $server->group_id)) {
-                abort(500, '该组已被节点所使用，无法删除');
+                abort(500, 'Nhóm đã được sử dụng bởi nút và không thể xóa');
             }
         }
 
         if (Plan::where('group_id', $request->input('id'))->first()) {
-            abort(500, '该组已被订阅所使用，无法删除');
+            abort(500, 'Nhóm đã được đăng ký sử dụng và không thể xóa');
         }
         if (User::where('group_id', $request->input('id'))->first()) {
-            abort(500, '该组已被用户所使用，无法删除');
+            abort(500, 'Nhóm đã được người dùng sử dụng và không thể xóa');
         }
 
         return response([

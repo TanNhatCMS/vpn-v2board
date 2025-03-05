@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 
 <head>
     <link rel="stylesheet" href="/assets/admin/components.chunk.css?v={{$version}}">

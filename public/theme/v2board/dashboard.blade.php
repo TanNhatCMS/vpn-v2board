@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 
 <head>
     <link rel="stylesheet" href="/theme/{{$theme}}/assets/components.chunk.css?v={{$version}}">
@@ -33,13 +33,8 @@
             background_url: '{{$theme_config['background_url']}}',
             description: '{{$description}}',
             i18n: [
-                'zh-CN',
                 'en-US',
-                'ja-JP',
                 'vi-VN',
-                'ko-KR',
-                'zh-TW',
-                'fa-IR'
             ],
             logo: '{{$logo}}'
         }

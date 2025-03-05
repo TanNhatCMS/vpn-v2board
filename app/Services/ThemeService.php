@@ -21,7 +21,7 @@ class ThemeService
     {
         $themeConfigFile = $this->path."{$this->theme}/config.json";
         if (! File::exists($themeConfigFile)) {
-            abort(500, "{$this->theme} the theme does not exist");
+            abort(500, "{$this->theme} chủ đề không tồn tại");
         }
         $themeConfig = json_decode(File::get($themeConfigFile), true);
         if (! isset($themeConfig['configs']) || ! is_array($themeConfig)) {

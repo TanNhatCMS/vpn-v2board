@@ -30,12 +30,12 @@ class HysteriaController extends Controller
         if ($request->input('id')) {
             $server = ServerHysteria::find($request->input('id'));
             if (! $server) {
-                abort(500, '服务器不存在');
+                abort(500, 'Máy chủ không tồn tại');
             }
             try {
                 $server->update($params);
             } catch (\Exception $e) {
-                abort(500, '保存失败');
+                abort(500, 'Lưu không thành công');
             }
 
             return response([
