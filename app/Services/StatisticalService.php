@@ -215,7 +215,6 @@ class StatisticalService
                     ->where('record_at', '<', $this->endAt)
                     ->orderBy('record_at', 'ASC')
                     ->get();
-
         }
     }
 
@@ -230,7 +229,6 @@ class StatisticalService
 
             case 'invite_rank':
                 return $this->buildInviteRank($limit);
-
         }
     }
 
