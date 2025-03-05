@@ -15,8 +15,6 @@ class User extends Authenticatable
 
     protected $table = 'users';
 
-    protected $dateFormat = 'U';
-
     protected $guarded = ['id'];
 
     /**
@@ -50,8 +48,6 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'created_at' => 'timestamp',
-            'updated_at' => 'timestamp',
         ];
     }
 }

@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class ServerVmess extends Model
 {
     protected $table = 'server_vmess';
-    protected $dateFormat = 'U';
     protected $guarded = ['id'];
     protected $casts = [
         'group_id' => 'array',

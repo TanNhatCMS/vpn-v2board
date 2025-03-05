@@ -7,6 +7,5 @@ use Illuminate\Database\Eloquent\Model;
 class Knowledge extends Model
 {
     protected $table = 'knowledge';
-    protected $dateFormat = 'U';
     protected $guarded = ['id'];
 }

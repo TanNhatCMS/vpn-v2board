@@ -6,8 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    protected $table = 'order';
-    protected $dateFormat = 'U';
+    protected $table = 'orders';
     protected $guarded = ['id'];
     protected $casts = [
         'surplus_order_ids' => 'array',

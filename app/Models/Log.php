@@ -7,6 +7,5 @@ use Illuminate\Database\Eloquent\Model;
 class Log extends Model
 {
     protected $table = 'log';
-    protected $dateFormat = 'U';
     protected $guarded = ['id'];
 }
