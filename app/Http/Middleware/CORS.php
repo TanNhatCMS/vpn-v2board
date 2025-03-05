@@ -11,7 +11,7 @@ class CORS
         $origin = $request->header('origin');
         if (empty($origin)) {
             $referer = $request->header('referer');
-            if (!empty($referer) && preg_match("/^((https|http):\/\/)?([^\/]+)/i", $referer, $matches)) {
+            if (! empty($referer) && preg_match("/^((https|http):\/\/)?([^\/]+)/i", $referer, $matches)) {
                 $origin = $matches[0];
             }
         }
