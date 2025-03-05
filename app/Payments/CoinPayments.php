@@ -2,8 +2,10 @@
 
 namespace App\Payments;
 
-class CoinPayments {
-    public function __construct($config) {
+class CoinPayments
+{
+    public function __construct($config)
+    {
         $this->config = $config;
     }
 
@@ -24,13 +26,12 @@ class CoinPayments {
                 'label' => '货币代码',
                 'description' => '填写您的货币代码（大写），建议与 Merchant Settings 中的值相同',
                 'type' => 'input',
-            ]
+            ],
         ];
     }
 
     public function pay($order)
     {
-
         // IPN notifications are slow, when the transaction is successful, we should return to the user center to avoid user confusion
         $parseUrl = parse_url($order['return_url']);
         $port = isset($parseUrl['port']) ? ":{$parseUrl['port']}" : '';
@@ -47,21 +48,20 @@ class CoinPayments {
             'amountf' => sprintf('%.2f', $order['total_amount'] / 100),
             'success_url' => $successUrl,
             'cancel_url' => $order['return_url'],
-            'ipn_url' => $order['notify_url']
+            'ipn_url' => $order['notify_url'],
         ];
 
         $params_string = http_build_query($params);
 
         return [
             'type' => 1, // Redirect to url
-            'data' =>  'https://www.coinpayments.net/index.php?' . $params_string
+            'data' => 'https://www.coinpayments.net/index.php?'.$params_string,
         ];
     }
 
     public function notify($params)
     {
-
-        if (!isset($params['merchant']) || $params['merchant'] != trim($this->config['coinpayments_merchant_id'])) {
+        if (! isset($params['merchant']) || $params['merchant'] != trim($this->config['coinpayments_merchant_id'])) {
             abort(500, 'No or incorrect Merchant ID passed');
         }
 
@@ -74,13 +74,13 @@ class CoinPayments {
         $headerName = 'Hmac';
         $signHeader = isset($headers[$headerName]) ? $headers[$headerName] : '';
 
-        $hmac = hash_hmac("sha512", $request, trim($this->config['coinpayments_ipn_secret']));
+        $hmac = hash_hmac('sha512', $request, trim($this->config['coinpayments_ipn_secret']));
 
         // if ($hmac != $signHeader) { <-- Use this if you are running a version of PHP below 5.6.0 without the hash_equals function
         //     abort(400, 'HMAC signature does not match');
         // }
 
-        if (!hash_equals($hmac, $signHeader)) {
+        if (! hash_equals($hmac, $signHeader)) {
             abort(400, 'HMAC signature does not match');
         }
 
@@ -91,14 +91,14 @@ class CoinPayments {
             return [
                 'trade_no' => $params['item_number'],
                 'callback_no' => $params['txn_id'],
-                'custom_result' => 'IPN OK'
+                'custom_result' => 'IPN OK',
             ];
-        } else if ($status < 0) {
+        } elseif ($status < 0) {
             //payment error, this is usually final but payments will sometimes be reopened if there was no exchange rate conversion or with seller consent
             abort(500, 'Payment Timed Out or Error');
         } else {
             //payment is pending, you can optionally add a note to the order page
-            die('IPN OK: pending');
+            exit('IPN OK: pending');
         }
     }
 }

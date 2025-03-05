@@ -2,10 +2,11 @@
 
 namespace App\Payments;
 
-use Stripe\Stripe;
 use Stripe\Checkout\Session;
+use Stripe\Stripe;
 
-class StripeCheckout {
+class StripeCheckout
+{
     public function __construct($config)
     {
         $this->config = $config;
@@ -38,7 +39,7 @@ class StripeCheckout {
                 'label' => '自定义字段名称',
                 'description' => '例如可设置为“联系方式”，以便及时与客户取得联系',
                 'type' => 'input',
-            ]
+            ],
         ];
     }
 
@@ -46,7 +47,7 @@ class StripeCheckout {
     {
         $currency = $this->config['currency'];
         $exchange = $this->exchange('CNY', strtoupper($currency));
-        if (!$exchange) {
+        if (! $exchange) {
             abort(500, __('Currency conversion has timed out, please try again later'));
         }
         $customFieldName = isset($this->config['stripe_custom_field_name']) ? $this->config['stripe_custom_field_name'] : 'Contact Infomation';
@@ -60,12 +61,12 @@ class StripeCheckout {
                     'price_data' => [
                         'currency' => $currency,
                         'product_data' => [
-                            'name' => $order['trade_no']
+                            'name' => $order['trade_no'],
                         ],
-                        'unit_amount' => floor($order['total_amount'] * $exchange)
+                        'unit_amount' => floor($order['total_amount'] * $exchange),
                     ],
-                    'quantity' => 1
-                ]
+                    'quantity' => 1,
+                ],
             ],
             'mode' => 'payment',
             'invoice_creation' => ['enabled' => true],
@@ -88,9 +89,10 @@ class StripeCheckout {
             info($e);
             abort(500, "Failed to create order. Error: {$e->getMessage}");
         }
+
         return [
             'type' => 1, // 0:qrcode 1:url
-            'data' => $session->url
+            'data' => $session->url,
         ];
     }
 
@@ -113,27 +115,29 @@ class StripeCheckout {
                 if ($object->payment_status === 'paid') {
                     return [
                         'trade_no' => $object->client_reference_id,
-                        'callback_no' => $object->payment_intent
+                        'callback_no' => $object->payment_intent,
                     ];
                 }
                 break;
             case 'checkout.session.async_payment_succeeded':
                 $object = $event->data->object;
+
                 return [
                     'trade_no' => $object->client_reference_id,
-                    'callback_no' => $object->payment_intent
+                    'callback_no' => $object->payment_intent,
                 ];
                 break;
             default:
                 abort(500, 'event is not support');
         }
-        die('success');
+        exit('success');
     }
 
     private function exchange($from, $to)
     {
-        $result = file_get_contents('https://api.exchangerate.host/latest?symbols=' . $to . '&base=' . $from);
+        $result = file_get_contents('https://api.exchangerate.host/latest?symbols='.$to.'&base='.$from);
         $result = json_decode($result, true);
+
         return $result['rates'][$to];
     }
 }
