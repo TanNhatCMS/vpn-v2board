@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Client\Protocols;
 
-
 class QuantumultX
 {
     public $flag = 'quantumult%20x';
@@ -32,6 +31,7 @@ class QuantumultX
                 $uri .= self::buildTrojan($user['uuid'], $item);
             }
         }
+
         return base64_encode($uri);
     }
 
@@ -43,11 +43,12 @@ class QuantumultX
             "password={$password}",
             'fast-open=true',
             'udp-relay=true',
-            "tag={$server['name']}"
+            "tag={$server['name']}",
         ];
         $config = array_filter($config);
         $uri = implode(',', $config);
         $uri .= "\r\n";
+
         return $uri;
     }
 
@@ -59,31 +60,37 @@ class QuantumultX
             "password={$uuid}",
             'fast-open=true',
             'udp-relay=true',
-            "tag={$server['name']}"
+            "tag={$server['name']}",
         ];
 
         if ($server['tls']) {
-            if ($server['network'] === 'tcp')
+            if ($server['network'] === 'tcp') {
                 array_push($config, 'obfs=over-tls');
+            }
             if ($server['tlsSettings']) {
                 $tlsSettings = $server['tlsSettings'];
-                if (isset($tlsSettings['allowInsecure']) && !empty($tlsSettings['allowInsecure']))
-                    array_push($config, 'tls-verification=' . ($tlsSettings['allowInsecure'] ? 'false' : 'true'));
-                if (isset($tlsSettings['serverName']) && !empty($tlsSettings['serverName']))
+                if (isset($tlsSettings['allowInsecure']) && ! empty($tlsSettings['allowInsecure'])) {
+                    array_push($config, 'tls-verification='.($tlsSettings['allowInsecure'] ? 'false' : 'true'));
+                }
+                if (isset($tlsSettings['serverName']) && ! empty($tlsSettings['serverName'])) {
                     $host = $tlsSettings['serverName'];
+                }
             }
         }
         if ($server['network'] === 'ws') {
-            if ($server['tls'])
+            if ($server['tls']) {
                 array_push($config, 'obfs=wss');
-            else
+            } else {
                 array_push($config, 'obfs=ws');
+            }
             if ($server['networkSettings']) {
                 $wsSettings = $server['networkSettings'];
-                if (isset($wsSettings['path']) && !empty($wsSettings['path']))
+                if (isset($wsSettings['path']) && ! empty($wsSettings['path'])) {
                     array_push($config, "obfs-uri={$wsSettings['path']}");
-                if (isset($wsSettings['headers']['Host']) && !empty($wsSettings['headers']['Host']) && !isset($host))
+                }
+                if (isset($wsSettings['headers']['Host']) && ! empty($wsSettings['headers']['Host']) && ! isset($host)) {
                     $host = $wsSettings['headers']['Host'];
+                }
             }
         }
         if (isset($host)) {
@@ -92,6 +99,7 @@ class QuantumultX
 
         $uri = implode(',', $config);
         $uri .= "\r\n";
+
         return $uri;
     }
 
@@ -101,16 +109,17 @@ class QuantumultX
             "trojan={$server['host']}:{$server['port']}",
             "password={$password}",
             'over-tls=true',
-            $server['server_name'] ? "tls-host={$server['server_name']}" : "",
+            $server['server_name'] ? "tls-host={$server['server_name']}" : '',
             // Tips: allowInsecure=false = tls-verification=true
             $server['allow_insecure'] ? 'tls-verification=false' : 'tls-verification=true',
             'fast-open=true',
             'udp-relay=true',
-            "tag={$server['name']}"
+            "tag={$server['name']}",
         ];
         $config = array_filter($config);
         $uri = implode(',', $config);
         $uri .= "\r\n";
+
         return $uri;
     }
 }

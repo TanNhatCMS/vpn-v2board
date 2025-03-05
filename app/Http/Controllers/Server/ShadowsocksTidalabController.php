@@ -2,13 +2,12 @@
 
 namespace App\Http\Controllers\Server;
 
+use App\Http\Controllers\Controller;
 use App\Models\ServerShadowsocks;
 use App\Services\ServerService;
-use App\Services\StatisticalService;
 use App\Services\UserService;
 use App\Utils\CacheKey;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Cache;
 
 /*
@@ -34,7 +33,7 @@ class ShadowsocksTidalabController extends Controller
         ini_set('memory_limit', -1);
         $nodeId = $request->input('node_id');
         $server = ServerShadowsocks::find($nodeId);
-        if (!$server) {
+        if (! $server) {
             abort(500, 'fail');
         }
         Cache::put(CacheKey::get('SERVER_SHADOWSOCKS_LAST_CHECK_AT', $server->id), time(), 3600);
@@ -46,15 +45,16 @@ class ShadowsocksTidalabController extends Controller
                 'id' => $user->id,
                 'port' => $server->server_port,
                 'cipher' => $server->cipher,
-                'secret' => $user->uuid
+                'secret' => $user->uuid,
             ]);
         }
         $eTag = sha1(json_encode($result));
-        if (strpos($request->header('If-None-Match'), $eTag) !== false ) {
+        if (strpos($request->header('If-None-Match'), $eTag) !== false) {
             abort(304);
         }
+
         return response([
-            'data' => $result
+            'data' => $result,
         ])->header('ETag', "\"{$eTag}\"");
     }
 
@@ -63,10 +63,10 @@ class ShadowsocksTidalabController extends Controller
     {
 //         Log::info('serverSubmitData:' . $request->input('node_id') . ':' . file_get_contents('php://input'));
         $server = ServerShadowsocks::find($request->input('node_id'));
-        if (!$server) {
+        if (! $server) {
             return response([
                 'ret' => 0,
-                'msg' => 'server is not found'
+                'msg' => 'server is not found',
             ]);
         }
         $data = file_get_contents('php://input');
@@ -83,7 +83,7 @@ class ShadowsocksTidalabController extends Controller
 
         return response([
             'ret' => 1,
-            'msg' => 'ok'
+            'msg' => 'ok',
         ]);
     }
 }

@@ -31,6 +31,7 @@ class SagerNet
                 $uri .= self::buildTrojan($user['uuid'], $item);
             }
         }
+
         return base64_encode($uri);
     }
 
@@ -42,51 +43,65 @@ class SagerNet
             ['-', '_', ''],
             base64_encode("{$server['cipher']}:{$uuid}")
         );
+
         return "ss://{$str}@{$server['host']}:{$server['port']}#{$name}\r\n";
     }
 
     public static function buildShadowsocksSIP008($uuid, $server)
     {
         $config = [
-            "id" => $server['id'],
-            "remarks" => $server['name'],
-            "server" => $server['host'],
-            "server_port" => $server['port'],
-            "password" => $uuid,
-            "method" => $server['cipher']
+            'id' => $server['id'],
+            'remarks' => $server['name'],
+            'server' => $server['host'],
+            'server_port' => $server['port'],
+            'password' => $uuid,
+            'method' => $server['cipher'],
         ];
+
         return $config;
     }
 
     public static function buildVmess($uuid, $server)
     {
         $config = [
-            "encryption" => "none",
-            "type" => urlencode($server['network']),
-            "security" => $server['tls'] ? "tls" : "",
+            'encryption' => 'none',
+            'type' => urlencode($server['network']),
+            'security' => $server['tls'] ? 'tls' : '',
         ];
         if ($server['tls']) {
             if ($server['tlsSettings']) {
                 $tlsSettings = $server['tlsSettings'];
-                if (isset($tlsSettings['serverName']) && !empty($tlsSettings['serverName']))
+                if (isset($tlsSettings['serverName']) && ! empty($tlsSettings['serverName'])) {
                     $config['sni'] = urlencode($tlsSettings['serverName']);
+                }
             }
         }
-        if ((string)$server['network'] === 'tcp') {
+        if ((string) $server['network'] === 'tcp') {
             $tcpSettings = $server['networkSettings'];
-            if (isset($tcpSettings['header']['type'])) $config['type'] = $tcpSettings['header']['type'];
-            if (isset($tcpSettings['header']['request']['path'][0])) $config['path'] = $tcpSettings['header']['request']['path'][0];
+            if (isset($tcpSettings['header']['type'])) {
+                $config['type'] = $tcpSettings['header']['type'];
+            }
+            if (isset($tcpSettings['header']['request']['path'][0])) {
+                $config['path'] = $tcpSettings['header']['request']['path'][0];
+            }
         }
-        if ((string)$server['network'] === 'ws') {
+        if ((string) $server['network'] === 'ws') {
             $wsSettings = $server['networkSettings'];
-            if (isset($wsSettings['path'])) $config['path'] = $wsSettings['path'];
-            if (isset($wsSettings['headers']['Host'])) $config['host'] = urlencode($wsSettings['headers']['Host']);
+            if (isset($wsSettings['path'])) {
+                $config['path'] = $wsSettings['path'];
+            }
+            if (isset($wsSettings['headers']['Host'])) {
+                $config['host'] = urlencode($wsSettings['headers']['Host']);
+            }
         }
-        if ((string)$server['network'] === 'grpc') {
+        if ((string) $server['network'] === 'grpc') {
             $grpcSettings = $server['networkSettings'];
-            if (isset($grpcSettings['serviceName'])) $config['serviceName'] = urlencode($grpcSettings['serviceName']);
+            if (isset($grpcSettings['serviceName'])) {
+                $config['serviceName'] = urlencode($grpcSettings['serviceName']);
+            }
         }
-        return "vmess://" . $uuid . "@" . $server['host'] . ":" . $server['port'] . "?" . http_build_query($config) . "#" . urlencode($server['name']) . "\r\n";
+
+        return 'vmess://'.$uuid.'@'.$server['host'].':'.$server['port'].'?'.http_build_query($config).'#'.urlencode($server['name'])."\r\n";
     }
 
     public static function buildTrojan($uuid, $server)
@@ -95,10 +110,11 @@ class SagerNet
         $query = http_build_query([
             'allowInsecure' => $server['allow_insecure'],
             'peer' => $server['server_name'],
-            'sni' => $server['server_name']
+            'sni' => $server['server_name'],
         ]);
         $uri = "trojan://{$uuid}@{$server['host']}:{$server['port']}?{$query}#{$name}";
         $uri .= "\r\n";
+
         return $uri;
     }
 }

@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Admin\Server;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ServerTrojanSave;
 use App\Http\Requests\Admin\ServerTrojanUpdate;
+use App\Models\ServerTrojan;
 use App\Services\ServerService;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Models\ServerTrojan;
 
 class TrojanController extends Controller
 {
@@ -16,7 +16,7 @@ class TrojanController extends Controller
         $params = $request->validated();
         if ($request->input('id')) {
             $server = ServerTrojan::find($request->input('id'));
-            if (!$server) {
+            if (! $server) {
                 abort(500, '服务器不存在');
             }
             try {
@@ -24,17 +24,18 @@ class TrojanController extends Controller
             } catch (\Exception $e) {
                 abort(500, '保存失败');
             }
+
             return response([
-                'data' => true
+                'data' => true,
             ]);
         }
 
-        if (!ServerTrojan::create($params)) {
+        if (! ServerTrojan::create($params)) {
             abort(500, '创建失败');
         }
 
         return response([
-            'data' => true
+            'data' => true,
         ]);
     }
 
@@ -42,12 +43,13 @@ class TrojanController extends Controller
     {
         if ($request->input('id')) {
             $server = ServerTrojan::find($request->input('id'));
-            if (!$server) {
+            if (! $server) {
                 abort(500, '节点ID不存在');
             }
         }
+
         return response([
-            'data' => $server->delete()
+            'data' => $server->delete(),
         ]);
     }
 
@@ -59,7 +61,7 @@ class TrojanController extends Controller
 
         $server = ServerTrojan::find($request->input('id'));
 
-        if (!$server) {
+        if (! $server) {
             abort(500, '该服务器不存在');
         }
         try {
@@ -69,7 +71,7 @@ class TrojanController extends Controller
         }
 
         return response([
-            'data' => true
+            'data' => true,
         ]);
     }
 
@@ -77,23 +79,25 @@ class TrojanController extends Controller
     {
         $server = ServerTrojan::find($request->input('id'));
         $server->show = 0;
-        if (!$server) {
+        if (! $server) {
             abort(500, '服务器不存在');
         }
-        if (!ServerTrojan::create($server->toArray())) {
+        if (! ServerTrojan::create($server->toArray())) {
             abort(500, '复制失败');
         }
 
         return response([
-            'data' => true
+            'data' => true,
         ]);
     }
+
     public function viewConfig(Request $request)
     {
         $serverService = new ServerService();
         $config = $serverService->getTrojanConfig($request->input('node_id'), 23333);
+
         return response([
-            'data' => $config
+            'data' => $config,
         ]);
     }
 }

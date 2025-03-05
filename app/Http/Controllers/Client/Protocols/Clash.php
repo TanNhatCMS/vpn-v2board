@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers\Client\Protocols;
 
-use App\Utils\Dict;
-use phpDocumentor\Reflection\Types\Self_;
 use Symfony\Component\Yaml\Yaml;
 
 class Clash
@@ -26,9 +24,9 @@ class Clash
         header("subscription-userinfo: upload={$user['u']}; download={$user['d']}; total={$user['transfer_enable']}; expire={$user['expired_at']}");
         header('profile-update-interval: 24');
         header("content-disposition:attachment;filename*=UTF-8''".rawurlencode($appName));
-        header("profile-web-page-url:" . config('v2board.app_url'));
-        $defaultConfig = base_path() . '/resources/rules/default.clash.yaml';
-        $customConfig = base_path() . '/resources/rules/custom.clash.yaml';
+        header('profile-web-page-url:'.config('v2board.app_url'));
+        $defaultConfig = base_path().'/resources/rules/default.clash.yaml';
+        $customConfig = base_path().'/resources/rules/custom.clash.yaml';
         if (\File::exists($customConfig)) {
             $config = Yaml::parseFile($customConfig);
         } else {
@@ -43,7 +41,7 @@ class Clash
                     'aes-128-gcm',
                     'aes-192-gcm',
                     'aes-256-gcm',
-                    'chacha20-ietf-poly1305'
+                    'chacha20-ietf-poly1305',
                 ])
             ) {
                 array_push($proxy, self::buildShadowsocks($user['uuid'], $item));
@@ -61,24 +59,32 @@ class Clash
 
         $config['proxies'] = array_merge($config['proxies'] ? $config['proxies'] : [], $proxy);
         foreach ($config['proxy-groups'] as $k => $v) {
-            if (!is_array($config['proxy-groups'][$k]['proxies'])) $config['proxy-groups'][$k]['proxies'] = [];
+            if (! is_array($config['proxy-groups'][$k]['proxies'])) {
+                $config['proxy-groups'][$k]['proxies'] = [];
+            }
             $isFilter = false;
             foreach ($config['proxy-groups'][$k]['proxies'] as $src) {
                 foreach ($proxies as $dst) {
-                    if (!$this->isRegex($src)) continue;
+                    if (! $this->isRegex($src)) {
+                        continue;
+                    }
                     $isFilter = true;
                     $config['proxy-groups'][$k]['proxies'] = array_values(array_diff($config['proxy-groups'][$k]['proxies'], [$src]));
                     if ($this->isMatch($src, $dst)) {
                         array_push($config['proxy-groups'][$k]['proxies'], $dst);
                     }
                 }
-                if ($isFilter) continue;
+                if ($isFilter) {
+                    continue;
+                }
             }
-            if ($isFilter) continue;
+            if ($isFilter) {
+                continue;
+            }
             $config['proxy-groups'][$k]['proxies'] = array_merge($config['proxy-groups'][$k]['proxies'], $proxies);
         }
 
-        $config['proxy-groups'] = array_filter($config['proxy-groups'], function($group) {
+        $config['proxy-groups'] = array_filter($config['proxy-groups'], function ($group) {
             return $group['proxies'];
         });
         $config['proxy-groups'] = array_values($config['proxy-groups']);
@@ -90,6 +96,7 @@ class Clash
 
         $yaml = Yaml::dump($config, 2, 4, Yaml::DUMP_EMPTY_ARRAY_AS_SEQUENCE);
         $yaml = str_replace('$app_name', config('v2board.app_name', 'V2Board'), $yaml);
+
         return $yaml;
     }
 
@@ -103,6 +110,7 @@ class Clash
         $array['cipher'] = $server['cipher'];
         $array['password'] = $uuid;
         $array['udp'] = true;
+
         return $array;
     }
 
@@ -122,30 +130,40 @@ class Clash
             $array['tls'] = true;
             if ($server['tlsSettings']) {
                 $tlsSettings = $server['tlsSettings'];
-                if (isset($tlsSettings['allowInsecure']) && !empty($tlsSettings['allowInsecure']))
+                if (isset($tlsSettings['allowInsecure']) && ! empty($tlsSettings['allowInsecure'])) {
                     $array['skip-cert-verify'] = ($tlsSettings['allowInsecure'] ? true : false);
-                if (isset($tlsSettings['serverName']) && !empty($tlsSettings['serverName']))
+                }
+                if (isset($tlsSettings['serverName']) && ! empty($tlsSettings['serverName'])) {
                     $array['servername'] = $tlsSettings['serverName'];
+                }
             }
         }
         if ($server['network'] === 'tcp') {
             $tcpSettings = $server['networkSettings'];
-            if (isset($tcpSettings['header']['type'])) $array['network'] = $tcpSettings['header']['type'];
-            if (isset($tcpSettings['header']['request']['path'][0])) $array['http-opts']['path'] = $tcpSettings['header']['request']['path'][0];
+            if (isset($tcpSettings['header']['type'])) {
+                $array['network'] = $tcpSettings['header']['type'];
+            }
+            if (isset($tcpSettings['header']['request']['path'][0])) {
+                $array['http-opts']['path'] = $tcpSettings['header']['request']['path'][0];
+            }
         }
         if ($server['network'] === 'ws') {
             $array['network'] = 'ws';
             if ($server['networkSettings']) {
                 $wsSettings = $server['networkSettings'];
                 $array['ws-opts'] = [];
-                if (isset($wsSettings['path']) && !empty($wsSettings['path']))
+                if (isset($wsSettings['path']) && ! empty($wsSettings['path'])) {
                     $array['ws-opts']['path'] = $wsSettings['path'];
-                if (isset($wsSettings['headers']['Host']) && !empty($wsSettings['headers']['Host']))
+                }
+                if (isset($wsSettings['headers']['Host']) && ! empty($wsSettings['headers']['Host'])) {
                     $array['ws-opts']['headers'] = ['Host' => $wsSettings['headers']['Host']];
-                if (isset($wsSettings['path']) && !empty($wsSettings['path']))
+                }
+                if (isset($wsSettings['path']) && ! empty($wsSettings['path'])) {
                     $array['ws-path'] = $wsSettings['path'];
-                if (isset($wsSettings['headers']['Host']) && !empty($wsSettings['headers']['Host']))
+                }
+                if (isset($wsSettings['headers']['Host']) && ! empty($wsSettings['headers']['Host'])) {
                     $array['ws-headers'] = ['Host' => $wsSettings['headers']['Host']];
+                }
             }
         }
         if ($server['network'] === 'grpc') {
@@ -153,7 +171,9 @@ class Clash
             if ($server['networkSettings']) {
                 $grpcSettings = $server['networkSettings'];
                 $array['grpc-opts'] = [];
-                if (isset($grpcSettings['serviceName'])) $array['grpc-opts']['grpc-service-name'] = $grpcSettings['serviceName'];
+                if (isset($grpcSettings['serviceName'])) {
+                    $array['grpc-opts']['grpc-service-name'] = $grpcSettings['serviceName'];
+                }
             }
         }
 
@@ -169,8 +189,13 @@ class Clash
         $array['port'] = $server['port'];
         $array['password'] = $password;
         $array['udp'] = true;
-        if (!empty($server['server_name'])) $array['sni'] = $server['server_name'];
-        if (!empty($server['allow_insecure'])) $array['skip-cert-verify'] = ($server['allow_insecure'] ? true : false);
+        if (! empty($server['server_name'])) {
+            $array['sni'] = $server['server_name'];
+        }
+        if (! empty($server['allow_insecure'])) {
+            $array['skip-cert-verify'] = ($server['allow_insecure'] ? true : false);
+        }
+
         return $array;
     }
 

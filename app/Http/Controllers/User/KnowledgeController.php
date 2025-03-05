@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
+use App\Models\Knowledge;
 use App\Models\User;
 use App\Services\UserService;
 use App\Utils\Helper;
 use Illuminate\Http\Request;
-use App\Models\Knowledge;
 
 class KnowledgeController extends Controller
 {
@@ -18,10 +18,12 @@ class KnowledgeController extends Controller
                 ->where('show', 1)
                 ->first()
                 ->toArray();
-            if (!$knowledge) abort(500, __('Article does not exist'));
+            if (! $knowledge) {
+                abort(500, __('Article does not exist'));
+            }
             $user = User::find($request->user['id']);
             $userService = new UserService();
-            if (!$userService->isAvailable($user)) {
+            if (! $userService->isAvailable($user)) {
                 $this->formatAccessData($knowledge['body']);
             }
             $subscribeUrl = Helper::getSubscribeUrl("/api/v1/client/subscribe?token={$user['token']}");
@@ -31,14 +33,15 @@ class KnowledgeController extends Controller
             $knowledge['body'] = str_replace(
                 '{{safeBase64SubscribeUrl}}',
                 str_replace(
-                    array('+', '/', '='),
-                    array('-', '_', ''),
+                    ['+', '/', '='],
+                    ['-', '_', ''],
                     base64_encode($subscribeUrl)
                 ),
                 $knowledge['body']
             );
+
             return response([
-                'data' => $knowledge
+                'data' => $knowledge,
             ]);
         }
         $builder = Knowledge::select(['id', 'category', 'title', 'updated_at'])
@@ -55,18 +58,24 @@ class KnowledgeController extends Controller
 
         $knowledges = $builder->get()
             ->groupBy('category');
+
         return response([
-            'data' => $knowledges
+            'data' => $knowledges,
         ]);
     }
 
     private function formatAccessData(&$body)
     {
-        function getBetween($input, $start, $end){$substr = substr($input, strlen($start)+strpos($input, $start),(strlen($input) - strpos($input, $end))*(-1));return $start . $substr . $end;}
+        function getBetween($input, $start, $end)
+        {
+            $substr = substr($input, strlen($start) + strpos($input, $start), (strlen($input) - strpos($input, $end)) * (-1));
+
+            return $start.$substr.$end;
+        }
         while (strpos($body, '<!--access start-->') !== false) {
             $accessData = getBetween($body, '<!--access start-->', '<!--access end-->');
             if ($accessData) {
-                $body = str_replace($accessData, '<div class="v2board-no-access">'. __('You must have a valid subscription to view content in this area') .'</div>', $body);
+                $body = str_replace($accessData, '<div class="v2board-no-access">'.__('You must have a valid subscription to view content in this area').'</div>', $body);
             }
         }
     }

@@ -2,23 +2,19 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Models\CommissionLog;
+use App\Models\Order;
 use App\Models\ServerShadowsocks;
 use App\Models\ServerTrojan;
-use App\Models\StatUser;
-use App\Services\ServerService;
-use App\Services\StatisticalService;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Models\ServerGroup;
 use App\Models\ServerVmess;
-use App\Models\Plan;
-use App\Models\User;
-use App\Models\Ticket;
-use App\Models\Order;
 use App\Models\Stat;
 use App\Models\StatServer;
-use Illuminate\Support\Facades\Cache;
+use App\Models\StatUser;
+use App\Models\Ticket;
+use App\Models\User;
+use App\Services\StatisticalService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class StatController extends Controller
@@ -27,7 +23,7 @@ class StatController extends Controller
     {
         $params = $request->validate([
             'start_at' => '',
-            'end_at' => ''
+            'end_at' => '',
         ]);
 
         if (isset($params['start_at']) && isset($params['end_at'])) {
@@ -38,24 +34,26 @@ class StatController extends Controller
                 ->toArray();
         } else {
             $statisticalService = new StatisticalService();
+
             return [
-                'data' => $statisticalService->generateStatData()
+                'data' => $statisticalService->generateStatData(),
             ];
         }
 
-        $stats = array_reduce($stats, function($carry, $item) {
-            foreach($item as $key => $value) {
-                if(isset($carry[$key]) && $carry[$key]) {
+        $stats = array_reduce($stats, function ($carry, $item) {
+            foreach ($item as $key => $value) {
+                if (isset($carry[$key]) && $carry[$key]) {
                     $carry[$key] += $value;
                 } else {
                     $carry[$key] = $value;
                 }
             }
+
             return $carry;
         }, []);
 
         return [
-            'data' => $stats
+            'data' => $stats,
         ];
     }
 
@@ -64,14 +62,15 @@ class StatController extends Controller
         $request->validate([
             'type' => 'required|in:paid_total,commission_total,register_count',
             'start_at' => '',
-            'end_at' => ''
+            'end_at' => '',
         ]);
 
         $statisticalService = new StatisticalService();
         $statisticalService->setStartAt($request->input('start_at'));
         $statisticalService->setEndAt($request->input('end_at'));
+
         return [
-            'data' => $statisticalService->getStatRecord($request->input('type'))
+            'data' => $statisticalService->getStatRecord($request->input('type')),
         ];
     }
 
@@ -81,14 +80,15 @@ class StatController extends Controller
             'type' => 'required|in:server_traffic_rank,user_consumption_rank,invite_rank',
             'start_at' => '',
             'end_at' => '',
-            'limit' => 'nullable|integer'
+            'limit' => 'nullable|integer',
         ]);
 
         $statisticalService = new StatisticalService();
         $statisticalService->setStartAt($request->input('start_at'));
         $statisticalService->setEndAt($request->input('end_at'));
+
         return [
-            'data' => $statisticalService->getRanking($request->input('type'), $request->input('limit') ?? 20)
+            'data' => $statisticalService->getRanking($request->input('type'), $request->input('limit') ?? 20),
         ];
     }
 
@@ -106,7 +106,7 @@ class StatController extends Controller
                 'ticket_pending_total' => Ticket::where('status', 0)
                     ->count(),
                 'commission_pending_total' => Order::where('commission_status', 0)
-                    ->where('invite_user_id', '!=', NULL)
+                    ->where('invite_user_id', '!=', null)
                     ->whereNotIn('status', [0, 2])
                     ->where('commission_balance', '>', 0)
                     ->count(),
@@ -124,7 +124,7 @@ class StatController extends Controller
                 'commission_last_month_payout' => CommissionLog::where('created_at', '>=', strtotime('-1 month', strtotime(date('Y-m-1'))))
                     ->where('created_at', '<', strtotime(date('Y-m-1')))
                     ->sum('get_amount'),
-            ]
+            ],
         ];
     }
 
@@ -141,27 +141,28 @@ class StatController extends Controller
             $result[] = [
                 'type' => '收款金额',
                 'date' => $date,
-                'value' => $statistic['paid_total'] / 100
+                'value' => $statistic['paid_total'] / 100,
             ];
             $result[] = [
                 'type' => '收款笔数',
                 'date' => $date,
-                'value' => $statistic['paid_count']
+                'value' => $statistic['paid_count'],
             ];
             $result[] = [
                 'type' => '佣金金额(已发放)',
                 'date' => $date,
-                'value' => $statistic['commission_total'] / 100
+                'value' => $statistic['commission_total'] / 100,
             ];
             $result[] = [
                 'type' => '佣金笔数(已发放)',
                 'date' => $date,
-                'value' => $statistic['commission_count']
+                'value' => $statistic['commission_count'],
             ];
         }
         $result = array_reverse($result);
+
         return [
-            'data' => $result
+            'data' => $result,
         ];
     }
 
@@ -171,7 +172,7 @@ class StatController extends Controller
             'shadowsocks' => ServerShadowsocks::where('parent_id', null)->get()->toArray(),
             'v2ray' => ServerVmess::where('parent_id', null)->get()->toArray(),
             'trojan' => ServerTrojan::where('parent_id', null)->get()->toArray(),
-            'vmess' => ServerVmess::where('parent_id', null)->get()->toArray()
+            'vmess' => ServerVmess::where('parent_id', null)->get()->toArray(),
         ];
         $startAt = strtotime('-1 day', strtotime(date('Y-m-d')));
         $endAt = strtotime(date('Y-m-d'));
@@ -180,7 +181,7 @@ class StatController extends Controller
             'server_type',
             'u',
             'd',
-            DB::raw('(u+d) as total')
+            DB::raw('(u+d) as total'),
         ])
             ->where('record_at', '>=', $startAt)
             ->where('record_at', '<', $endAt)
@@ -198,15 +199,16 @@ class StatController extends Controller
             $statistics[$k]['total'] = $statistics[$k]['total'] / 1073741824;
         }
         array_multisort(array_column($statistics, 'total'), SORT_DESC, $statistics);
+
         return [
-            'data' => $statistics
+            'data' => $statistics,
         ];
     }
 
     public function getStatUser(Request $request)
     {
         $request->validate([
-            'user_id' => 'required|integer'
+            'user_id' => 'required|integer',
         ]);
         $current = $request->input('current') ? $request->input('current') : 1;
         $pageSize = $request->input('pageSize') >= 10 ? $request->input('pageSize') : 10;
@@ -215,11 +217,10 @@ class StatController extends Controller
         $total = $builder->count();
         $records = $builder->forPage($current, $pageSize)
             ->get();
+
         return [
             'data' => $records,
-            'total' => $total
+            'total' => $total,
         ];
     }
-
 }
-

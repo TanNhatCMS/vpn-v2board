@@ -2,18 +2,17 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Requests\Admin\NoticeSave;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\NoticeSave;
 use App\Models\Notice;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Http\Request;
 
 class NoticeController extends Controller
 {
     public function fetch(Request $request)
     {
         return response([
-            'data' => Notice::orderBy('id', 'DESC')->get()
+            'data' => Notice::orderBy('id', 'DESC')->get(),
         ]);
     }
 
@@ -23,10 +22,10 @@ class NoticeController extends Controller
             'title',
             'content',
             'img_url',
-            'tags'
+            'tags',
         ]);
-        if (!$request->input('id')) {
-            if (!Notice::create($data)) {
+        if (! $request->input('id')) {
+            if (! Notice::create($data)) {
                 abort(500, '保存失败');
             }
         } else {
@@ -36,12 +35,11 @@ class NoticeController extends Controller
                 abort(500, '保存失败');
             }
         }
+
         return response([
-            'data' => true
+            'data' => true,
         ]);
     }
-
-
 
     public function show(Request $request)
     {
@@ -49,16 +47,16 @@ class NoticeController extends Controller
             abort(500, '参数有误');
         }
         $notice = Notice::find($request->input('id'));
-        if (!$notice) {
+        if (! $notice) {
             abort(500, '公告不存在');
         }
         $notice->show = $notice->show ? 0 : 1;
-        if (!$notice->save()) {
+        if (! $notice->save()) {
             abort(500, '保存失败');
         }
 
         return response([
-            'data' => true
+            'data' => true,
         ]);
     }
 
@@ -68,14 +66,15 @@ class NoticeController extends Controller
             abort(500, '参数错误');
         }
         $notice = Notice::find($request->input('id'));
-        if (!$notice) {
+        if (! $notice) {
             abort(500, '公告不存在');
         }
-        if (!$notice->delete()) {
+        if (! $notice->delete()) {
             abort(500, '删除失败');
         }
+
         return response([
-            'data' => true
+            'data' => true,
         ]);
     }
 }

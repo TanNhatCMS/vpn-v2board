@@ -5,7 +5,6 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Services\CouponService;
 use Illuminate\Http\Request;
-use App\Models\Coupon;
 
 class CouponController extends Controller
 {
@@ -18,8 +17,9 @@ class CouponController extends Controller
         $couponService->setPlanId($request->input('plan_id'));
         $couponService->setUserId($request->user['id']);
         $couponService->check();
+
         return response([
-            'data' => $couponService->getCoupon()
+            'data' => $couponService->getCoupon(),
         ]);
     }
 }

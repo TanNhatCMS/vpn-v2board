@@ -15,7 +15,7 @@ class UserChangePassword extends FormRequest
     {
         return [
             'old_password' => 'required',
-            'new_password' => 'required|min:8'
+            'new_password' => 'required|min:8',
         ];
     }
 
@@ -24,7 +24,7 @@ class UserChangePassword extends FormRequest
         return [
             'old_password.required' => __('Old password cannot be empty'),
             'new_password.required' => __('New password cannot be empty'),
-            'new_password.min' => __('Password must be greater than 8 digits')
+            'new_password.min' => __('Password must be greater than 8 digits'),
         ];
     }
 }

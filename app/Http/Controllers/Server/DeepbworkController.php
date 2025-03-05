@@ -2,18 +2,14 @@
 
 namespace App\Http\Controllers\Server;
 
+use App\Http\Controllers\Controller;
+use App\Models\ServerVmess;
 use App\Services\ServerService;
-use App\Services\StatisticalService;
 use App\Services\UserService;
 use App\Utils\CacheKey;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Models\User;
-use App\Models\ServerVmess;
-use App\Models\ServerLog;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 /*
  * V2ray Aurora
@@ -21,7 +17,8 @@ use Illuminate\Support\Facades\Cache;
  */
 class DeepbworkController extends Controller
 {
-    CONST V2RAY_CONFIG = '{"log":{"loglevel":"debug","access":"access.log","error":"error.log"},"api":{"services":["HandlerService","StatsService"],"tag":"api"},"dns":{},"stats":{},"inbounds":[{"port":443,"protocol":"vmess","settings":{"clients":[]},"sniffing":{"enabled":true,"destOverride":["http","tls"]},"streamSettings":{"network":"tcp"},"tag":"proxy"},{"listen":"127.0.0.1","port":23333,"protocol":"dokodemo-door","settings":{"address":"0.0.0.0"},"tag":"api"}],"outbounds":[{"protocol":"freedom","settings":{}},{"protocol":"blackhole","settings":{},"tag":"block"}],"routing":{"rules":[{"type":"field","inboundTag":"api","outboundTag":"api"}]},"policy":{"levels":{"0":{"handshake":4,"connIdle":300,"uplinkOnly":5,"downlinkOnly":30,"statsUserUplink":true,"statsUserDownlink":true}}}}';
+    const V2RAY_CONFIG = '{"log":{"loglevel":"debug","access":"access.log","error":"error.log"},"api":{"services":["HandlerService","StatsService"],"tag":"api"},"dns":{},"stats":{},"inbounds":[{"port":443,"protocol":"vmess","settings":{"clients":[]},"sniffing":{"enabled":true,"destOverride":["http","tls"]},"streamSettings":{"network":"tcp"},"tag":"proxy"},{"listen":"127.0.0.1","port":23333,"protocol":"dokodemo-door","settings":{"address":"0.0.0.0"},"tag":"api"}],"outbounds":[{"protocol":"freedom","settings":{}},{"protocol":"blackhole","settings":{},"tag":"block"}],"routing":{"rules":[{"type":"field","inboundTag":"api","outboundTag":"api"}]},"policy":{"levels":{"0":{"handshake":4,"connIdle":300,"uplinkOnly":5,"downlinkOnly":30,"statsUserUplink":true,"statsUserDownlink":true}}}}';
+
     public function __construct(Request $request)
     {
         $token = $request->input('token');
@@ -39,7 +36,7 @@ class DeepbworkController extends Controller
         ini_set('memory_limit', -1);
         $nodeId = $request->input('node_id');
         $server = ServerVmess::find($nodeId);
-        if (!$server) {
+        if (! $server) {
             abort(500, 'fail');
         }
         Cache::put(CacheKey::get('SERVER_VMESS_LAST_CHECK_AT', $server->id), time(), 3600);
@@ -48,18 +45,19 @@ class DeepbworkController extends Controller
         $result = [];
         foreach ($users as $user) {
             $user->v2ray_user = [
-                "uuid" => $user->uuid,
-                "email" => sprintf("%s@v2board.user", $user->uuid),
-                "alter_id" => 0,
-                "level" => 0,
+                'uuid' => $user->uuid,
+                'email' => sprintf('%s@v2board.user', $user->uuid),
+                'alter_id' => 0,
+                'level' => 0,
             ];
             unset($user['uuid']);
             array_push($result, $user);
         }
         $eTag = sha1(json_encode($result));
-        if (strpos($request->header('If-None-Match'), $eTag) !== false ) {
+        if (strpos($request->header('If-None-Match'), $eTag) !== false) {
             abort(304);
         }
+
         return response([
             'msg' => 'ok',
             'data' => $result,
@@ -71,10 +69,10 @@ class DeepbworkController extends Controller
     {
 //         Log::info('serverSubmitData:' . $request->input('node_id') . ':' . file_get_contents('php://input'));
         $server = ServerVmess::find($request->input('node_id'));
-        if (!$server) {
+        if (! $server) {
             return response([
                 'ret' => 0,
-                'msg' => 'server is not found'
+                'msg' => 'server is not found',
             ]);
         }
         $data = file_get_contents('php://input');
@@ -91,7 +89,7 @@ class DeepbworkController extends Controller
 
         return response([
             'ret' => 1,
-            'msg' => 'ok'
+            'msg' => 'ok',
         ]);
     }
 
@@ -109,19 +107,19 @@ class DeepbworkController extends Controller
             abort(500, $e->getMessage());
         }
 
-        die(json_encode($json, JSON_UNESCAPED_UNICODE));
+        exit(json_encode($json, JSON_UNESCAPED_UNICODE));
     }
 
     private function getV2RayConfig(int $nodeId, int $localPort)
     {
         $server = ServerVmess::find($nodeId);
-        if (!$server) {
+        if (! $server) {
             abort(500, '节点不存在');
         }
         $json = json_decode(self::V2RAY_CONFIG);
-        $json->log->loglevel = (int)config('v2board.server_log_enable') ? 'debug' : 'none';
-        $json->inbounds[1]->port = (int)$localPort;
-        $json->inbounds[0]->port = (int)$server->server_port;
+        $json->log->loglevel = (int) config('v2board.server_log_enable') ? 'debug' : 'none';
+        $json->inbounds[1]->port = (int) $localPort;
+        $json->inbounds[0]->port = (int) $server->server_port;
         $json->inbounds[0]->streamSettings->network = $server->network;
         $this->setDns($server, $json);
         $this->setNetwork($server, $json);
@@ -182,27 +180,27 @@ class DeepbworkController extends Controller
             // domain
             if (isset($ruleSettings->domain)) {
                 $ruleSettings->domain = array_filter($ruleSettings->domain);
-                if (!empty($ruleSettings->domain)) {
+                if (! empty($ruleSettings->domain)) {
                     $domainRules = array_merge($domainRules, $ruleSettings->domain);
                 }
             }
             // protocol
             if (isset($ruleSettings->protocol)) {
                 $ruleSettings->protocol = array_filter($ruleSettings->protocol);
-                if (!empty($ruleSettings->protocol)) {
+                if (! empty($ruleSettings->protocol)) {
                     $protocolRules = array_merge($protocolRules, $ruleSettings->protocol);
                 }
             }
         }
-        if (!empty($domainRules)) {
-            $domainObj = new \StdClass();
+        if (! empty($domainRules)) {
+            $domainObj = new \stdClass();
             $domainObj->type = 'field';
             $domainObj->domain = $domainRules;
             $domainObj->outboundTag = 'block';
             array_push($json->routing->rules, $domainObj);
         }
-        if (!empty($protocolRules)) {
-            $protocolObj = new \StdClass();
+        if (! empty($protocolRules)) {
+            $protocolObj = new \stdClass();
             $protocolObj->type = 'field';
             $protocolObj->protocol = $protocolRules;
             $protocolObj->outboundTag = 'block';
@@ -215,19 +213,19 @@ class DeepbworkController extends Controller
 
     private function setTls(ServerVMess $server, object $json)
     {
-        if ((int)$server->tls) {
+        if ((int) $server->tls) {
             $tlsSettings = $server->tlsSettings;
             $json->inbounds[0]->streamSettings->security = 'tls';
-            $tls = (object)[
+            $tls = (object) [
                 'certificateFile' => '/root/.cert/server.crt',
-                'keyFile' => '/root/.cert/server.key'
+                'keyFile' => '/root/.cert/server.key',
             ];
-            $json->inbounds[0]->streamSettings->tlsSettings = new \StdClass();
+            $json->inbounds[0]->streamSettings->tlsSettings = new \stdClass();
             if (isset($tlsSettings->serverName)) {
-                $json->inbounds[0]->streamSettings->tlsSettings->serverName = (string)$tlsSettings->serverName;
+                $json->inbounds[0]->streamSettings->tlsSettings->serverName = (string) $tlsSettings->serverName;
             }
             if (isset($tlsSettings->allowInsecure)) {
-                $json->inbounds[0]->streamSettings->tlsSettings->allowInsecure = (int)$tlsSettings->allowInsecure ? true : false;
+                $json->inbounds[0]->streamSettings->tlsSettings->allowInsecure = (int) $tlsSettings->allowInsecure ? true : false;
             }
             $json->inbounds[0]->streamSettings->tlsSettings->certificates[0] = $tls;
         }

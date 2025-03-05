@@ -17,7 +17,7 @@ class MailSend extends FormRequest
             'type' => 'required|in:1,2,3,4',
             'subject' => 'required',
             'content' => 'required',
-            'receiver' => 'array'
+            'receiver' => 'array',
         ];
     }
 
@@ -28,7 +28,7 @@ class MailSend extends FormRequest
             'type.in' => '发送类型格式有误',
             'subject.required' => '主题不能为空',
             'content.required' => '内容不能为空',
-            'receiver.array' => '收件人格式有误'
+            'receiver.array' => '收件人格式有误',
         ];
     }
 }

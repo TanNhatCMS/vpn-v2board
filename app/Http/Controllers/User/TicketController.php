@@ -5,14 +5,13 @@ namespace App\Http\Controllers\User;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\TicketSave;
 use App\Http\Requests\User\TicketWithdraw;
-use App\Jobs\SendTelegramJob;
+use App\Models\Ticket;
+use App\Models\TicketMessage;
 use App\Models\User;
 use App\Services\TelegramService;
 use App\Services\TicketService;
 use App\Utils\Dict;
 use Illuminate\Http\Request;
-use App\Models\Ticket;
-use App\Models\TicketMessage;
 use Illuminate\Support\Facades\DB;
 
 class TicketController extends Controller
@@ -23,7 +22,7 @@ class TicketController extends Controller
             $ticket = Ticket::where('id', $request->input('id'))
                 ->where('user_id', $request->user['id'])
                 ->first();
-            if (!$ticket) {
+            if (! $ticket) {
                 abort(500, __('Ticket does not exist'));
             }
             $ticket['message'] = TicketMessage::where('ticket_id', $ticket->id)->get();
@@ -34,47 +33,50 @@ class TicketController extends Controller
                     $ticket['message'][$i]['is_me'] = false;
                 }
             }
+
             return response([
-                'data' => $ticket
+                'data' => $ticket,
             ]);
         }
         $ticket = Ticket::where('user_id', $request->user['id'])
             ->orderBy('created_at', 'DESC')
             ->get();
+
         return response([
-            'data' => $ticket
+            'data' => $ticket,
         ]);
     }
 
     public function save(TicketSave $request)
     {
         DB::beginTransaction();
-        if ((int)Ticket::where('status', 0)->where('user_id', $request->user['id'])->lockForUpdate()->count()) {
+        if ((int) Ticket::where('status', 0)->where('user_id', $request->user['id'])->lockForUpdate()->count()) {
             abort(500, __('There are other unresolved tickets'));
         }
         $ticket = Ticket::create(array_merge($request->only([
             'subject',
-            'level'
+            'level',
         ]), [
-            'user_id' => $request->user['id']
+            'user_id' => $request->user['id'],
         ]));
-        if (!$ticket) {
+        if (! $ticket) {
             DB::rollback();
             abort(500, __('Failed to open ticket'));
         }
         $ticketMessage = TicketMessage::create([
             'user_id' => $request->user['id'],
             'ticket_id' => $ticket->id,
-            'message' => $request->input('message')
+            'message' => $request->input('message'),
         ]);
-        if (!$ticketMessage) {
+        if (! $ticketMessage) {
             DB::rollback();
             abort(500, __('Failed to open ticket'));
         }
         DB::commit();
         $this->sendNotify($ticket, $request->input('message'));
+
         return response([
-            'data' => true
+            'data' => true,
         ]);
     }
 
@@ -89,7 +91,7 @@ class TicketController extends Controller
         $ticket = Ticket::where('id', $request->input('id'))
             ->where('user_id', $request->user['id'])
             ->first();
-        if (!$ticket) {
+        if (! $ticket) {
             abort(500, __('Ticket does not exist'));
         }
         if ($ticket->status) {
@@ -99,7 +101,7 @@ class TicketController extends Controller
             abort(500, __('Please wait for the technical enginneer to reply'));
         }
         $ticketService = new TicketService();
-        if (!$ticketService->reply(
+        if (! $ticketService->reply(
             $ticket,
             $request->input('message'),
             $request->user['id']
@@ -107,11 +109,11 @@ class TicketController extends Controller
             abort(500, __('Ticket reply failed'));
         }
         $this->sendNotify($ticket, $request->input('message'));
+
         return response([
-            'data' => true
+            'data' => true,
         ]);
     }
-
 
     public function close(Request $request)
     {
@@ -121,15 +123,16 @@ class TicketController extends Controller
         $ticket = Ticket::where('id', $request->input('id'))
             ->where('user_id', $request->user['id'])
             ->first();
-        if (!$ticket) {
+        if (! $ticket) {
             abort(500, __('Ticket does not exist'));
         }
         $ticket->status = 1;
-        if (!$ticket->save()) {
+        if (! $ticket->save()) {
             abort(500, __('Close failed'));
         }
+
         return response([
-            'data' => true
+            'data' => true,
         ]);
     }
 
@@ -142,10 +145,10 @@ class TicketController extends Controller
 
     public function withdraw(TicketWithdraw $request)
     {
-        if ((int)config('v2board.withdraw_close_enable', 0)) {
+        if ((int) config('v2board.withdraw_close_enable', 0)) {
             abort(500, 'user.ticket.withdraw.not_support_withdraw');
         }
-        if (!in_array(
+        if (! in_array(
             $request->input('withdraw_method'),
             config(
                 'v2board.commission_withdraw_method',
@@ -164,29 +167,30 @@ class TicketController extends Controller
         $ticket = Ticket::create([
             'subject' => $subject,
             'level' => 2,
-            'user_id' => $request->user['id']
+            'user_id' => $request->user['id'],
         ]);
-        if (!$ticket) {
+        if (! $ticket) {
             DB::rollback();
             abort(500, __('Failed to open ticket'));
         }
         $message = sprintf("%s\r\n%s",
-            __('Withdrawal method') . "：" . $request->input('withdraw_method'),
-            __('Withdrawal account') . "：" . $request->input('withdraw_account')
+            __('Withdrawal method').'：'.$request->input('withdraw_method'),
+            __('Withdrawal account').'：'.$request->input('withdraw_account')
         );
         $ticketMessage = TicketMessage::create([
             'user_id' => $request->user['id'],
             'ticket_id' => $ticket->id,
-            'message' => $message
+            'message' => $message,
         ]);
-        if (!$ticketMessage) {
+        if (! $ticketMessage) {
             DB::rollback();
             abort(500, __('Failed to open ticket'));
         }
         DB::commit();
         $this->sendNotify($ticket, $message);
+
         return response([
-            'data' => true
+            'data' => true,
         ]);
     }
 

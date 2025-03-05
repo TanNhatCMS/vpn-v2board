@@ -14,7 +14,7 @@ class UserTransfer extends FormRequest
     public function rules()
     {
         return [
-            'transfer_amount' => 'required|integer|min:1'
+            'transfer_amount' => 'required|integer|min:1',
         ];
     }
 
@@ -23,7 +23,7 @@ class UserTransfer extends FormRequest
         return [
             'transfer_amount.required' => __('The transfer amount cannot be empty'),
             'transfer_amount.integer' => __('The transfer amount parameter is wrong'),
-            'transfer_amount.min' => __('The transfer amount parameter is wrong')
+            'transfer_amount.min' => __('The transfer amount parameter is wrong'),
         ];
     }
 }

@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Staff;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\UserSendMail;
 use App\Http\Requests\Staff\UserUpdate;
 use App\Jobs\SendEmailJob;
-use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Models\User;
 use App\Models\Plan;
+use App\Models\User;
+use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
@@ -21,9 +21,12 @@ class UserController extends Controller
             ->where('id', $request->input('id'))
             ->where('is_staff', 0)
             ->first();
-        if (!$user) abort(500, '用户不存在');
+        if (! $user) {
+            abort(500, '用户不存在');
+        }
+
         return response([
-            'data' => $user
+            'data' => $user,
         ]);
     }
 
@@ -31,7 +34,7 @@ class UserController extends Controller
     {
         $params = $request->validated();
         $user = User::find($request->input('id'));
-        if (!$user) {
+        if (! $user) {
             abort(500, '用户不存在');
         }
         if (User::where('email', $params['email'])->first() && $user->email !== $params['email']) {
@@ -39,13 +42,13 @@ class UserController extends Controller
         }
         if (isset($params['password'])) {
             $params['password'] = password_hash($params['password'], PASSWORD_DEFAULT);
-            $params['password_algo'] = NULL;
+            $params['password_algo'] = null;
         } else {
             unset($params['password']);
         }
         if (isset($params['plan_id'])) {
             $plan = Plan::find($params['plan_id']);
-            if (!$plan) {
+            if (! $plan) {
                 abort(500, '订阅计划不存在');
             }
             $params['group_id'] = $plan->group_id;
@@ -56,8 +59,9 @@ class UserController extends Controller
         } catch (\Exception $e) {
             abort(500, '保存失败');
         }
+
         return response([
-            'data' => true
+            'data' => true,
         ]);
     }
 
@@ -76,13 +80,13 @@ class UserController extends Controller
                 'template_value' => [
                     'name' => config('v2board.app_name', 'V2Board'),
                     'url' => config('v2board.app_url'),
-                    'content' => $request->input('content')
-                ]
+                    'content' => $request->input('content'),
+                ],
             ]);
         }
 
         return response([
-            'data' => true
+            'data' => true,
         ]);
     }
 
@@ -94,14 +98,14 @@ class UserController extends Controller
         $this->filter($request, $builder);
         try {
             $builder->update([
-                'banned' => 1
+                'banned' => 1,
             ]);
         } catch (\Exception $e) {
             abort(500, '处理失败');
         }
 
         return response([
-            'data' => true
+            'data' => true,
         ]);
     }
 }

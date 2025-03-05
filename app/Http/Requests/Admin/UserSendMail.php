@@ -23,7 +23,7 @@ class UserSendMail extends FormRequest
     {
         return [
             'subject.required' => '主题不能为空',
-            'content.required' => '发送内容不能为空'
+            'content.required' => '发送内容不能为空',
         ];
     }
 }

@@ -4,11 +4,11 @@ namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
 use App\Models\CommissionLog;
-use Illuminate\Http\Request;
-use App\Models\User;
-use App\Models\Order;
 use App\Models\InviteCode;
+use App\Models\Order;
+use App\Models\User;
 use App\Utils\Helper;
+use Illuminate\Http\Request;
 
 class InviteController extends Controller
 {
@@ -20,8 +20,9 @@ class InviteController extends Controller
         $inviteCode = new InviteCode();
         $inviteCode->user_id = $request->user['id'];
         $inviteCode->code = Helper::randomChar(8);
+
         return response([
-            'data' => $inviteCode->save()
+            'data' => $inviteCode->save(),
         ]);
     }
 
@@ -36,15 +37,16 @@ class InviteController extends Controller
                 'trade_no',
                 'order_amount',
                 'get_amount',
-                'created_at'
+                'created_at',
             ])
             ->orderBy('created_at', 'DESC');
         $total = $builder->count();
         $details = $builder->forPage($current, $pageSize)
             ->get();
+
         return response([
             'data' => $details,
-            'total' => $total
+            'total' => $total,
         ]);
     }
 
@@ -58,7 +60,7 @@ class InviteController extends Controller
         if ($user->commission_rate) {
             $commission_rate = $user->commission_rate;
         }
-        $uncheck_commission_balance = (int)Order::where('status', 3)
+        $uncheck_commission_balance = (int) Order::where('status', 3)
             ->where('commission_status', 0)
             ->where('invite_user_id', $request->user['id'])
             ->sum('commission_balance');
@@ -67,22 +69,23 @@ class InviteController extends Controller
         }
         $stat = [
             //已注册用户数
-            (int)User::where('invite_user_id', $request->user['id'])->count(),
+            (int) User::where('invite_user_id', $request->user['id'])->count(),
             //有效的佣金
-            (int)CommissionLog::where('invite_user_id', $request->user['id'])
+            (int) CommissionLog::where('invite_user_id', $request->user['id'])
                 ->sum('get_amount'),
             //确认中的佣金
             $uncheck_commission_balance,
             //佣金比例
-            (int)$commission_rate,
+            (int) $commission_rate,
             //可用佣金
-            (int)$user->commission_balance
+            (int) $user->commission_balance,
         ];
+
         return response([
             'data' => [
                 'codes' => $codes,
-                'stat' => $stat
-            ]
+                'stat' => $stat,
+            ],
         ]);
     }
 }
