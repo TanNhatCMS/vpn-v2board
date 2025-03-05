@@ -11,6 +11,6 @@ class Coupon extends Model
     protected $guarded = ['id'];
     protected $casts = [
         'limit_plan_ids' => 'array',
-        'limit_period' => 'array'
+        'limit_period' => 'array',
     ];
 }

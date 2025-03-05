@@ -15,13 +15,13 @@ class Helper
     }
 
     /**
-     * Returns a GUIDv4 string
+     * Returns a GUIDv4 string.
      *
      * Uses the best cryptographically secure method
      * for all supported platforms with fallback to an older,
      * less secure version.
      *
-     * @param bool $format
+     * @param  bool  $format
      * @return string
      */
     public static function guid(bool $format = false): string
