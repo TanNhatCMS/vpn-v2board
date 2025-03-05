@@ -21,3 +21,12 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+/config/v2board.php
+/public/env.example.js
+.idea
+.lock
+composer.phar
+composer.lock
+yarn.lock
+docker-compose.yml
+.DS_Store
