@@ -12,6 +12,7 @@ class Language
         if ($request->header('content-language')) {
             App::setLocale($request->header('content-language'));
         }
+
         return $next($request);
     }
 }
