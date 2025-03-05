@@ -100,7 +100,6 @@ class UserService
 
             case $user->plan->reset_traffic_method === 4:
                 return $this->calcResetDayByYearExpiredAt($user->expired_at);
-
         }
 
         return null;
