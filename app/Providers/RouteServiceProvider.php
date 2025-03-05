@@ -70,10 +70,10 @@ class RouteServiceProvider extends ServiceProvider
         Route::group([
             'prefix' => '/api/v1',
             'middleware' => 'api',
-            'namespace' => $this->namespace
+            'namespace' => $this->namespace,
         ], function ($router) {
-            foreach (glob(app_path('Http//Routes') . '/*.php') as $file) {
-                $this->app->make('App\\Http\\Routes\\' . basename($file, '.php'))->map($router);
+            foreach (glob(app_path('Http//Routes').'/*.php') as $file) {
+                $this->app->make('App\\Http\\Routes\\'.basename($file, '.php'))->map($router);
             }
         });
     }

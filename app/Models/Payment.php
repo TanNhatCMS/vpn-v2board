@@ -10,6 +10,6 @@ class Payment extends Model
     protected $dateFormat = 'U';
     protected $guarded = ['id'];
     protected $casts = [
-        'config' => 'array'
+        'config' => 'array',
     ];
 }

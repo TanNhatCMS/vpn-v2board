@@ -10,6 +10,6 @@ class Notice extends Model
     protected $dateFormat = 'U';
     protected $guarded = ['id'];
     protected $casts = [
-        'tags' => 'array'
+        'tags' => 'array',
     ];
 }
