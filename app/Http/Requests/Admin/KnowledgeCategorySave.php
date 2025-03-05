@@ -15,7 +15,7 @@ class KnowledgeCategorySave extends FormRequest
     {
         return [
             'name' => 'required',
-            'language' => 'required'
+            'language' => 'required',
         ];
     }
 
@@ -23,7 +23,7 @@ class KnowledgeCategorySave extends FormRequest
     {
         return [
             'name.required' => '分类名称不能为空',
-            'language.required' => '分类语言不能为空'
+            'language.required' => '分类语言不能为空',
         ];
     }
 }

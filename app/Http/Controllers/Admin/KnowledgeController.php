@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\KnowledgeSave;
 use App\Http\Requests\Admin\KnowledgeSort;
 use App\Models\Knowledge;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\DB;
 
 class KnowledgeController extends Controller
@@ -15,22 +15,26 @@ class KnowledgeController extends Controller
     {
         if ($request->input('id')) {
             $knowledge = Knowledge::find($request->input('id'))->toArray();
-            if (!$knowledge) abort(500, '知识不存在');
+            if (! $knowledge) {
+                abort(500, '知识不存在');
+            }
+
             return response([
-                'data' => $knowledge
+                'data' => $knowledge,
             ]);
         }
+
         return response([
             'data' => Knowledge::select(['title', 'id', 'updated_at', 'category', 'show'])
                 ->orderBy('sort', 'ASC')
-                ->get()
+                ->get(),
         ]);
     }
 
     public function getCategory(Request $request)
     {
         return response([
-            'data' => array_keys(Knowledge::get()->groupBy('category')->toArray())
+            'data' => array_keys(Knowledge::get()->groupBy('category')->toArray()),
         ]);
     }
 
@@ -38,8 +42,8 @@ class KnowledgeController extends Controller
     {
         $params = $request->validated();
 
-        if (!$request->input('id')) {
-            if (!Knowledge::create($params)) {
+        if (! $request->input('id')) {
+            if (! Knowledge::create($params)) {
                 abort(500, '创建失败');
             }
         } else {
@@ -51,7 +55,7 @@ class KnowledgeController extends Controller
         }
 
         return response([
-            'data' => true
+            'data' => true,
         ]);
     }
 
@@ -61,16 +65,16 @@ class KnowledgeController extends Controller
             abort(500, '参数有误');
         }
         $knowledge = Knowledge::find($request->input('id'));
-        if (!$knowledge) {
+        if (! $knowledge) {
             abort(500, '知识不存在');
         }
         $knowledge->show = $knowledge->show ? 0 : 1;
-        if (!$knowledge->save()) {
+        if (! $knowledge->save()) {
             abort(500, '保存失败');
         }
 
         return response([
-            'data' => true
+            'data' => true,
         ]);
     }
 
@@ -88,8 +92,9 @@ class KnowledgeController extends Controller
             abort(500, '保存失败');
         }
         DB::commit();
+
         return response([
-            'data' => true
+            'data' => true,
         ]);
     }
 
@@ -99,15 +104,15 @@ class KnowledgeController extends Controller
             abort(500, '参数有误');
         }
         $knowledge = Knowledge::find($request->input('id'));
-        if (!$knowledge) {
+        if (! $knowledge) {
             abort(500, '知识不存在');
         }
-        if (!$knowledge->delete()) {
+        if (! $knowledge->delete()) {
             abort(500, '删除失败');
         }
 
         return response([
-            'data' => true
+            'data' => true,
         ]);
     }
 }

@@ -4,7 +4,7 @@ namespace App\Http\Requests\User;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class TicketWithdraw  extends FormRequest
+class TicketWithdraw extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -15,7 +15,7 @@ class TicketWithdraw  extends FormRequest
     {
         return [
             'withdraw_method' => 'required',
-            'withdraw_account' => 'required'
+            'withdraw_account' => 'required',
         ];
     }
 
@@ -23,7 +23,7 @@ class TicketWithdraw  extends FormRequest
     {
         return [
             'withdraw_method.required' => __('The withdrawal method cannot be empty'),
-            'withdraw_account.required' => __('The withdrawal account cannot be empty')
+            'withdraw_account.required' => __('The withdrawal account cannot be empty'),
         ];
     }
 }

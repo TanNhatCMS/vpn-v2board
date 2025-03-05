@@ -3,9 +3,8 @@
 namespace App\Http\Controllers\User;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Notice;
-use App\Utils\Helper;
+use Illuminate\Http\Request;
 
 class NoticeController extends Controller
 {
@@ -18,9 +17,10 @@ class NoticeController extends Controller
         $total = $model->count();
         $res = $model->forPage($current, $pageSize)
             ->get();
+
         return response([
             'data' => $res,
-            'total' => $total
+            'total' => $total,
         ]);
     }
 }

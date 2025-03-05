@@ -29,7 +29,7 @@ class ServerVmessSave extends FormRequest
             'networkSettings' => 'nullable|array',
             'ruleSettings' => 'nullable|array',
             'tlsSettings' => 'nullable|array',
-            'dnsSettings' => 'nullable|array'
+            'dnsSettings' => 'nullable|array',
         ];
     }
 
@@ -53,7 +53,7 @@ class ServerVmessSave extends FormRequest
             'networkSettings.array' => '传输协议配置有误',
             'ruleSettings.array' => '规则配置有误',
             'tlsSettings.array' => 'tls配置有误',
-            'dnsSettings.array' => 'dns配置有误'
+            'dnsSettings.array' => 'dns配置有误',
         ];
     }
 }

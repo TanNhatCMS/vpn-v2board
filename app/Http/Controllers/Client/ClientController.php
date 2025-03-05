@@ -5,9 +5,9 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Client\Protocols\General;
 use App\Http\Controllers\Controller;
 use App\Services\ServerService;
+use App\Services\UserService;
 use App\Utils\Helper;
 use Illuminate\Http\Request;
-use App\Services\UserService;
 
 class ClientController extends Controller
 {
@@ -24,23 +24,27 @@ class ClientController extends Controller
             $servers = $serverService->getAvailableServers($user);
             $this->setSubscribeInfoToServers($servers, $user);
             if ($flag) {
-                foreach (array_reverse(glob(app_path('Http//Controllers//Client//Protocols') . '/*.php')) as $file) {
-                    $file = 'App\\Http\\Controllers\\Client\\Protocols\\' . basename($file, '.php');
+                foreach (array_reverse(glob(app_path('Http//Controllers//Client//Protocols').'/*.php')) as $file) {
+                    $file = 'App\\Http\\Controllers\\Client\\Protocols\\'.basename($file, '.php');
                     $class = new $file($user, $servers);
                     if (strpos($flag, $class->flag) !== false) {
-                        die($class->handle());
+                        exit($class->handle());
                     }
                 }
             }
             $class = new General($user, $servers);
-            die($class->handle());
+            exit($class->handle());
         }
     }
 
     private function setSubscribeInfoToServers(&$servers, $user)
     {
-        if (!isset($servers[0])) return;
-        if (!(int)config('v2board.show_info_to_server_enable', 0)) return;
+        if (! isset($servers[0])) {
+            return;
+        }
+        if (! (int) config('v2board.show_info_to_server_enable', 0)) {
+            return;
+        }
         $useTraffic = $user['u'] + $user['d'];
         $totalTraffic = $user['transfer_enable'];
         $remainingTraffic = Helper::trafficConvert($totalTraffic - $useTraffic);

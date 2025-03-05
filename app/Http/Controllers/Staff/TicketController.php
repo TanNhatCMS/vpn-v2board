@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Staff;
 
-use App\Services\TicketService;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
 use App\Models\TicketMessage;
+use App\Services\TicketService;
+use Illuminate\Http\Request;
 
 class TicketController extends Controller
 {
@@ -15,7 +15,7 @@ class TicketController extends Controller
         if ($request->input('id')) {
             $ticket = Ticket::where('id', $request->input('id'))
                 ->first();
-            if (!$ticket) {
+            if (! $ticket) {
                 abort(500, '工单不存在');
             }
             $ticket['message'] = TicketMessage::where('ticket_id', $ticket->id)->get();
@@ -26,22 +26,24 @@ class TicketController extends Controller
                     $ticket['message'][$i]['is_me'] = false;
                 }
             }
+
             return response([
-                'data' => $ticket
+                'data' => $ticket,
             ]);
         }
         $current = $request->input('current') ? $request->input('current') : 1;
         $pageSize = $request->input('pageSize') >= 10 ? $request->input('pageSize') : 10;
         $model = Ticket::orderBy('created_at', 'DESC');
-        if ($request->input('status') !== NULL) {
+        if ($request->input('status') !== null) {
             $model->where('status', $request->input('status'));
         }
         $total = $model->count();
         $res = $model->forPage($current, $pageSize)
             ->get();
+
         return response([
             'data' => $res,
-            'total' => $total
+            'total' => $total,
         ]);
     }
 
@@ -59,8 +61,9 @@ class TicketController extends Controller
             $request->input('message'),
             $request->user['id']
         );
+
         return response([
-            'data' => true
+            'data' => true,
         ]);
     }
 
@@ -71,15 +74,16 @@ class TicketController extends Controller
         }
         $ticket = Ticket::where('id', $request->input('id'))
             ->first();
-        if (!$ticket) {
+        if (! $ticket) {
             abort(500, '工单不存在');
         }
         $ticket->status = 1;
-        if (!$ticket->save()) {
+        if (! $ticket->save()) {
             abort(500, '关闭失败');
         }
+
         return response([
-            'data' => true
+            'data' => true,
         ]);
     }
 }

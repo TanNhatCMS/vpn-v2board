@@ -2,14 +2,10 @@
 
 namespace App\Http\Controllers\Staff;
 
-use App\Http\Requests\Admin\PlanSave;
-use App\Http\Requests\Admin\PlanSort;
-use App\Http\Requests\Admin\PlanUpdate;
-use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\Plan;
-use App\Models\Order;
 use App\Models\User;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class PlanController extends Controller
@@ -17,25 +13,28 @@ class PlanController extends Controller
     public function fetch(Request $request)
     {
         $counts = User::select(
-            DB::raw("plan_id"),
-            DB::raw("count(*) as count")
+            DB::raw('plan_id'),
+            DB::raw('count(*) as count')
         )
-            ->where('plan_id', '!=', NULL)
+            ->where('plan_id', '!=', null)
             ->where(function ($query) {
                 $query->where('expired_at', '>=', time())
-                    ->orWhere('expired_at', NULL);
+                    ->orWhere('expired_at', null);
             })
-            ->groupBy("plan_id")
+            ->groupBy('plan_id')
             ->get();
         $plans = Plan::orderBy('sort', 'ASC')->get();
         foreach ($plans as $k => $v) {
             $plans[$k]->count = 0;
             foreach ($counts as $kk => $vv) {
-                if ($plans[$k]->id === $counts[$kk]->plan_id) $plans[$k]->count = $counts[$kk]->count;
+                if ($plans[$k]->id === $counts[$kk]->plan_id) {
+                    $plans[$k]->count = $counts[$kk]->count;
+                }
             }
         }
+
         return response([
-            'data' => $plans
+            'data' => $plans,
         ]);
     }
 }

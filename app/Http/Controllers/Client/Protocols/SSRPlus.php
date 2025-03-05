@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Client\Protocols;
 
-
 class SSRPlus
 {
     public $flag = 'ssrplus';
@@ -32,6 +31,7 @@ class SSRPlus
                 $uri .= self::buildTrojan($user['uuid'], $item);
             }
         }
+
         return base64_encode($uri);
     }
 
@@ -43,41 +43,50 @@ class SSRPlus
             ['-', '_', ''],
             base64_encode("{$server['cipher']}:{$password}")
         );
+
         return "ss://{$str}@{$server['host']}:{$server['port']}#{$name}\r\n";
     }
 
     public static function buildVmess($uuid, $server)
     {
         $config = [
-            "v" => "2",
-            "ps" => $server['name'],
-            "add" => $server['host'],
-            "port" => (string)$server['port'],
-            "id" => $uuid,
-            "aid" => '0',
-            "net" => $server['network'],
-            "type" => "none",
-            "host" => "",
-            "path" => "",
-            "tls" => $server['tls'] ? "tls" : "",
+            'v' => '2',
+            'ps' => $server['name'],
+            'add' => $server['host'],
+            'port' => (string) $server['port'],
+            'id' => $uuid,
+            'aid' => '0',
+            'net' => $server['network'],
+            'type' => 'none',
+            'host' => '',
+            'path' => '',
+            'tls' => $server['tls'] ? 'tls' : '',
         ];
         if ($server['tls']) {
             if ($server['tlsSettings']) {
                 $tlsSettings = $server['tlsSettings'];
-                if (isset($tlsSettings['serverName']) && !empty($tlsSettings['serverName']))
+                if (isset($tlsSettings['serverName']) && ! empty($tlsSettings['serverName'])) {
                     $config['sni'] = $tlsSettings['serverName'];
+                }
             }
         }
-        if ((string)$server['network'] === 'ws') {
+        if ((string) $server['network'] === 'ws') {
             $wsSettings = $server['networkSettings'];
-            if (isset($wsSettings['path'])) $config['path'] = $wsSettings['path'];
-            if (isset($wsSettings['headers']['Host'])) $config['host'] = $wsSettings['headers']['Host'];
+            if (isset($wsSettings['path'])) {
+                $config['path'] = $wsSettings['path'];
+            }
+            if (isset($wsSettings['headers']['Host'])) {
+                $config['host'] = $wsSettings['headers']['Host'];
+            }
         }
-        if ((string)$server['network'] === 'grpc') {
+        if ((string) $server['network'] === 'grpc') {
             $grpcSettings = $server['networkSettings'];
-            if (isset($grpcSettings['serviceName'])) $config['path'] = $grpcSettings['serviceName'];
+            if (isset($grpcSettings['serviceName'])) {
+                $config['path'] = $grpcSettings['serviceName'];
+            }
         }
-        return "vmess://" . base64_encode(json_encode($config)) . "\r\n";
+
+        return 'vmess://'.base64_encode(json_encode($config))."\r\n";
     }
 
     public static function buildTrojan($password, $server)
@@ -86,11 +95,11 @@ class SSRPlus
         $query = http_build_query([
             'allowInsecure' => $server['allow_insecure'],
             'peer' => $server['server_name'],
-            'sni' => $server['server_name']
+            'sni' => $server['server_name'],
         ]);
         $uri = "trojan://{$password}@{$server['host']}:{$server['port']}?{$query}#{$name}";
         $uri .= "\r\n";
+
         return $uri;
     }
-
 }

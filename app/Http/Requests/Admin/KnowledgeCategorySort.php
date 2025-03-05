@@ -14,7 +14,7 @@ class KnowledgeCategorySort extends FormRequest
     public function rules()
     {
         return [
-            'knowledge_category_ids' => 'required|array'
+            'knowledge_category_ids' => 'required|array',
         ];
     }
 
@@ -22,7 +22,7 @@ class KnowledgeCategorySort extends FormRequest
     {
         return [
             'knowledge_category_ids.required' => '分类不能为空',
-            'knowledge_category_ids.array' => '分类格式有误'
+            'knowledge_category_ids.array' => '分类格式有误',
         ];
     }
 }
