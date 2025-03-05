@@ -17,7 +17,8 @@
         "laravel/tinker": "^2.10.1",
         "linfo/linfo": "^4.0",
         "php-curl-class/php-curl-class": "^11.0",
-        "stripe/stripe-php": "^16.6"
+        "stripe/stripe-php": "^16.6",
+        "ext-openssl": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",
