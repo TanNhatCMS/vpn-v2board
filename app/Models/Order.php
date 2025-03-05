@@ -10,6 +10,6 @@ class Order extends Model
     protected $dateFormat = 'U';
     protected $guarded = ['id'];
     protected $casts = [
-        'surplus_order_ids' => 'array'
+        'surplus_order_ids' => 'array',
     ];
 }

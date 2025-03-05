@@ -59,6 +59,7 @@ class AuthService
                 }
                 Cache::put($jwt, $user->toArray(), 3600);
             }
+
             return Cache::get($jwt);
         } catch (\Exception $e) {
             return false;
@@ -71,6 +72,7 @@ class AuthService
         if (! in_array($session, array_keys($sessions))) {
             return false;
         }
+
         return true;
     }
 

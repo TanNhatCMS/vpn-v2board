@@ -12,6 +12,6 @@ class ServerHysteria extends Model
     protected $casts = [
         'group_id' => 'array',
         'route_id' => 'array',
-        'tags' => 'array'
+        'tags' => 'array',
     ];
 }
