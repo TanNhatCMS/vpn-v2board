@@ -2,7 +2,8 @@
 
 namespace App\Payments;
 
-class EPay {
+class EPay
+{
     public function __construct($config)
     {
         $this->config = $config;
@@ -25,7 +26,7 @@ class EPay {
                 'label' => 'KEY',
                 'description' => '',
                 'type' => 'input',
-            ]
+            ],
         ];
     }
 
@@ -37,16 +38,17 @@ class EPay {
             'notify_url' => $order['notify_url'],
             'return_url' => $order['return_url'],
             'out_trade_no' => $order['trade_no'],
-            'pid' => $this->config['pid']
+            'pid' => $this->config['pid'],
         ];
         ksort($params);
         reset($params);
-        $str = stripslashes(urldecode(http_build_query($params))) . $this->config['key'];
+        $str = stripslashes(urldecode(http_build_query($params))).$this->config['key'];
         $params['sign'] = md5($str);
         $params['sign_type'] = 'MD5';
+
         return [
             'type' => 1, // 0:qrcode 1:url
-            'data' => $this->config['url'] . '/submit.php?' . http_build_query($params)
+            'data' => $this->config['url'].'/submit.php?'.http_build_query($params),
         ];
     }
 
@@ -57,13 +59,14 @@ class EPay {
         unset($params['sign_type']);
         ksort($params);
         reset($params);
-        $str = stripslashes(urldecode(http_build_query($params))) . $this->config['key'];
+        $str = stripslashes(urldecode(http_build_query($params))).$this->config['key'];
         if ($sign !== md5($str)) {
             return false;
         }
+
         return [
             'trade_no' => $params['out_trade_no'],
-            'callback_no' => $params['trade_no']
+            'callback_no' => $params['trade_no'],
         ];
     }
 }

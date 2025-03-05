@@ -1,14 +1,15 @@
 <?php
 
 /**
- * 自己写别抄，抄NMB抄
+ * 自己写别抄，抄NMB抄.
  */
+
 namespace App\Payments;
 
-use Stripe\Source;
 use Stripe\Stripe;
 
-class StripeCredit {
+class StripeCredit
+{
     public function __construct($config)
     {
         $this->config = $config;
@@ -36,7 +37,7 @@ class StripeCredit {
                 'label' => 'WebHook密钥签名',
                 'description' => '',
                 'type' => 'input',
-            ]
+            ],
         ];
     }
 
@@ -45,7 +46,7 @@ class StripeCredit {
         info($order);
         $currency = $this->config['currency'];
         $exchange = $this->exchange('CNY', strtoupper($currency));
-        if (!$exchange) {
+        if (! $exchange) {
             abort(500, __('Currency conversion has timed out, please try again later'));
         }
         Stripe::setApiKey($this->config['stripe_sk_live']);
@@ -57,19 +58,20 @@ class StripeCredit {
                 'metadata' => [
                     'user_id' => $order['user_id'],
                     'out_trade_no' => $order['trade_no'],
-                    'identifier' => ''
-                ]
+                    'identifier' => '',
+                ],
             ]);
         } catch (\Exception $e) {
             info($e);
             abort(500, __('Payment failed. Please check your credit card information'));
         }
-        if (!$charge->paid) {
+        if (! $charge->paid) {
             abort(500, __('Payment failed. Please check your credit card information'));
         }
+
         return [
             'type' => 2,
-            'data' => $charge->paid
+            'data' => $charge->paid,
         ];
     }
 
@@ -92,33 +94,35 @@ class StripeCredit {
                     'amount' => $object->amount,
                     'currency' => $object->currency,
                     'source' => $object->id,
-                    'metadata' => json_decode($object->metadata, true)
+                    'metadata' => json_decode($object->metadata, true),
                 ]);
                 break;
             case 'charge.succeeded':
                 $object = $event->data->object;
                 if ($object->status === 'succeeded') {
-                    if (!isset($object->metadata->out_trade_no) && !isset($object->source->metadata)) {
-                        die('order error');
+                    if (! isset($object->metadata->out_trade_no) && ! isset($object->source->metadata)) {
+                        exit('order error');
                     }
                     $metaData = isset($object->metadata->out_trade_no) ? $object->metadata : $object->source->metadata;
                     $tradeNo = $metaData->out_trade_no;
+
                     return [
                         'trade_no' => $tradeNo,
-                        'callback_no' => $object->id
+                        'callback_no' => $object->id,
                     ];
                 }
                 break;
             default:
                 abort(500, 'event is not support');
         }
-        die('success');
+        exit('success');
     }
 
     private function exchange($from, $to)
     {
-        $result = file_get_contents('https://api.exchangerate.host/latest?symbols=' . $to . '&base=' . $from);
+        $result = file_get_contents('https://api.exchangerate.host/latest?symbols='.$to.'&base='.$from);
         $result = json_decode($result, true);
+
         return $result['rates'][$to];
     }
 }
