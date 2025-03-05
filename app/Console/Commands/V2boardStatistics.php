@@ -24,7 +24,7 @@ class V2boardStatistics extends Command
      *
      * @var string
      */
-    protected $description = '统计任务';
+    protected $description = 'Statistical tasks';
 
     /**
      * Create a new command instance.
@@ -50,9 +50,12 @@ class V2boardStatistics extends Command
         $this->statUser();
         $this->statServer();
         $this->stat();
-        $this->info('耗时'.(microtime(true) - $startAt));
+        $this->info('Tiêu thụ'.(microtime(true) - $startAt));
     }
 
+    /**
+     * @throws Exception
+     */
     private function statServer(): void
     {
         $createdAt = time();
@@ -74,13 +77,16 @@ class V2boardStatistics extends Command
                 'record_at' => $recordAt,
             ])) {
                 DB::rollback();
-                throw new Exception('stat server fail');
+                throw new Exception('máy chủ stat không thành công');
             }
         }
         DB::commit();
         $statService->clearStatServer();
     }
 
+    /**
+     * @throws Exception
+     */
     private function statUser(): void
     {
         $createdAt = time();
@@ -102,7 +108,7 @@ class V2boardStatistics extends Command
                 'record_at' => $recordAt,
             ])) {
                 DB::rollback();
-                throw new Exception('stat user fail');
+                throw new Exception('người dùng stat không thành công');
             }
         }
         DB::commit();

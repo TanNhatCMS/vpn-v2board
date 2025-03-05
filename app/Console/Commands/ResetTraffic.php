@@ -23,7 +23,7 @@ class ResetTraffic extends Command
      *
      * @var string
      */
-    protected $description = 'Clear traffic';
+    protected $description = 'Đặt lại lưu lượng người dùng';
 
     /**
      * Create a new command instance.
@@ -40,9 +40,9 @@ class ResetTraffic extends Command
     /**
      * Execute the console command.
      *
-     * @return mixed
+     * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         ini_set('memory_limit', -1);
         $resetMethods = Plan::select(
@@ -112,7 +112,7 @@ class ResetTraffic extends Command
             $expireDay = date('m-d', $item->expired_at);
             $today = date('m-d');
             if ($expireDay === $today) {
-                array_push($users, $item->id);
+                $users[] = $item->id;
             }
         }
         User::whereIn('id', $users)->update([
@@ -133,7 +133,7 @@ class ResetTraffic extends Command
 
     private function resetByMonthFirstDay($builder): void
     {
-        if ((string) date('d') === '01') {
+        if (date('d') === '01') {
             $builder->update([
                 'u' => 0,
                 'd' => 0,
@@ -149,11 +149,11 @@ class ResetTraffic extends Command
             $expireDay = date('d', $item->expired_at);
             $today = date('d');
             if ($expireDay === $today) {
-                array_push($users, $item->id);
+                $users[] = $item->id;
             }
 
             if (($today === $lastDay) && $expireDay >= $lastDay) {
-                array_push($users, $item->id);
+                $users[] = $item->id;
             }
         }
         User::whereIn('id', $users)->update([

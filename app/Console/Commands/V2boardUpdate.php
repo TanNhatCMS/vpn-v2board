@@ -2,8 +2,8 @@
 
 namespace App\Console\Commands;
 
+use Artisan;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 
 class V2boardUpdate extends Command
 {
@@ -19,7 +19,7 @@ class V2boardUpdate extends Command
      *
      * @var string
      */
-    protected $description = 'v2board 更新';
+    protected $description = 'v2board update';
 
     /**
      * Create a new command instance.
@@ -34,30 +34,19 @@ class V2boardUpdate extends Command
     /**
      * Execute the console command.
      *
-     * @return mixed
+     * @return void
      */
-    public function handle()
+    public function handle(): void
     {
-        \Artisan::call('config:cache');
-        DB::connection()->getPdo();
-        //  $file = \File::get(base_path() . '/database/update.sql');
-        //  if (!$file) {
-        //      abort(500, '数据库文件不存在');
-        //  }
-        //  $sql = str_replace("\n", "", $file);
-        //  $sql = preg_split("/;/", $sql);
-        //  if (!is_array($sql)) {
-        //      abort(500, '数据库文件格式有误');
-        //   }
-        $this->info('正在导入数据库请稍等...');
-        //        foreach ($sql as $item) {
-        //            if (!$item) continue;
-        //            try {
-        //                DB::select(DB::raw($item));
-        //            } catch (\Exception $e) {
-        //            }
-        //        }
-        \Artisan::call('horizon:terminate');
-        $this->info('更新完毕，队列服务已重启，你无需进行任何操作。');
+        $this->info('Bắt đầu cập nhật...');
+        $this->info('Xóa bộ nhớ cache, vui lòng đợi...');
+        Artisan::call('config:cache');
+        Artisan::call('route:cache');
+        Artisan::call('view:clear');
+        $this->info('Cập nhật cơ sở dữ liệu, vui lòng đợi...');
+        Artisan::call('migrate');
+        $this->info('Cập nhật dữ liệu mẫu, vui lòng đợi...');
+        Artisan::call('horizon:terminate');
+        $this->info('Sau khi cập nhật hoàn tất, dịch vụ hàng đợi đã được khởi động lại và bạn không cần phải làm gì cả.');
     }
 }

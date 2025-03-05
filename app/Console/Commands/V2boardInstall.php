@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Models\User;
 use App\Utils\Helper;
+use Artisan;
 use Illuminate\Console\Command;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Support\Facades\DB;
@@ -36,10 +37,8 @@ class V2boardInstall extends Command
 
     /**
      * Execute the console command.
-     *
-     * @return mixed
      */
-    public function handle()
+    public function handle(): void
     {
         try {
             $this->info('__     ______  ____                      _  ');
@@ -49,59 +48,54 @@ class V2boardInstall extends Command
             $this->info("   \_/  |_____|____/ \___/ \__,_|_|  \__,_| ");
             if (\File::exists(base_path().'/.env')) {
                 $securePath = config('v2board.secure_path', config('v2board.frontend_admin_path', hash('crc32b', config('app.key'))));
-                $this->info("访问 http(s)://你的站点/{$securePath} 进入管理面板，你可以在用户中心修改你的密码。");
-                abort(500, '如需重新安装请删除目录下.env文件');
+                $this->info("Truy cập http(s)://Trang web của bạn/{$securePath} Truy cập bảng quản trị và bạn có thể thay đổi mật khẩu của mình trong trung tâm người dùng.");
+                abort(500, 'Nếu bạn cần cài đặt lại, hãy xóa tệp .env trong thư mục');
             }
-
+            $this->info('Bắt đầu cài đặt...');
             if (! copy(base_path().'/.env.example', base_path().'/.env')) {
-                abort(500, '复制环境文件失败，请检查目录权限');
+                abort(500, 'Không sao chép được các tệp môi trường, kiểm tra quyền thư mục');
             }
+            $this->info('Tệp môi trường đã được tạo');
             $this->saveToEnv([
                 'APP_KEY' => 'base64:'.base64_encode(Encrypter::generateKey('AES-256-CBC')),
-                'DB_HOST' => $this->ask('Please enter the database address (default:localhost）', 'localhost'),
-                'DB_DATABASE' => $this->ask('Please enter the database name'),
-                'DB_USERNAME' => $this->ask('Please enter the database username'),
-                'DB_PASSWORD' => $this->ask('Please enter the database password'),
+                'DB_HOST' => $this->ask('Vui lòng nhập địa chỉ cơ sở dữ liệu (mặc định:localhost）', 'localhost'),
+                'DB_DATABASE' => $this->ask('Vui lòng nhập tên cơ sở dữ liệu'),
+                'DB_USERNAME' => $this->ask('Vui lòng nhập tên người dùng cơ sở dữ liệu'),
+                'DB_PASSWORD' => $this->ask('Vui lòng nhập mật khẩu cơ sở dữ liệu'),
             ]);
-            \Artisan::call('config:clear');
-            \Artisan::call('config:cache');
+            Artisan::call('config:clear');
+            Artisan::call('config:cache');
+            $this->info('Cấu hình môi trường hoàn tất');
+            $this->info('Vui lòng chờ trong quá trình cài đặt cơ sở dữ liệu...');
+            Artisan::call('migrate');
+            $this->info('Cơ sở dữ liệu đã được cài đặt');
+            $this->info('Vui lòng chờ trong quá trình nhập cơ sở dữ liệu...');
+            Artisan::call('db:seed');
+            $this->info('Dữ liệu đã được nhập');
+            $email = '';
+            while (! $email) {
+                $email = $this->ask('Vui lòng nhập email quản trị viên?');
+            }
+            $name = '';
+            while (! $name) {
+                $name = $this->ask('Vui lòng nhập tên quản trị viên?');
+            }
+            $password = Helper::guid();
             try {
                 DB::connection()->getPdo();
             } catch (\Exception $e) {
-                abort(500, 'Database connection failed');
+                abort(500, 'Kết nối cơ sở dữ liệu không thành công');
             }
-            //            $file = \File::get(base_path() . '/database/install.sql');
-            //            if (!$file) {
-            //                abort(500, '数据库文件不存在');
-            //            }
-            //            $sql = str_replace("\n", "", $file);
-            //            $sql = preg_split("/;/", $sql);
-            //            if (!is_array($sql)) {
-            //                abort(500, '数据库文件格式有误');
-            //            }
-            $this->info('Please wait for the database import...');
-            //            foreach ($sql as $item) {
-            //                try {
-            //                    DB::select(DB::raw($item));
-            //                } catch (\Exception $e) {
-            //                }
-            //            }
-            $this->info('Database import completed');
-            $email = '';
-            while (! $email) {
-                $email = $this->ask('Please enter the administrator email?');
-            }
-            $password = Helper::guid(false);
             if (! $this->registerAdmin($email, $password)) {
-                abort(500, 'The administrator account registration failed, please try again');
+                abort(500, 'Đăng ký tài khoản quản trị viên không thành công, vui lòng thử lại');
             }
 
-            $this->info('Everything is ready');
-            $this->info("Administrator email:{$email}");
-            $this->info("Administrator password:{$password}");
+            $this->info('Mọi thứ đã sẵn sàng');
+            $this->info("Email quản trị viên:{$email}");
+            $this->info("Mật khẩu quản trị viên:{$password}");
 
             $defaultSecurePath = hash('crc32b', config('app.key'));
-            $this->info("访问 http(s)://你的站点/{$defaultSecurePath} 进入管理面板，你可以在用户中心修改你的密码。");
+            $this->info("Truy cập http(s)://Trang web của bạn/{$defaultSecurePath} Truy cập bảng quản trị và bạn có thể thay đổi mật khẩu của mình trong trung tâm người dùng.");
         } catch (\Exception $e) {
             $this->error($e->getMessage());
         }
@@ -112,7 +106,7 @@ class V2boardInstall extends Command
         $user = new User;
         $user->email = $email;
         if (strlen($password) < 8) {
-            abort(500, '管理员密码长度最小为8位字符');
+            abort(500, 'Độ dài tối thiểu của mật khẩu quản trị viên là 8 ký tự');
         }
         $user->password = password_hash($password, PASSWORD_DEFAULT);
         $user->uuid = Helper::guid(true);
@@ -122,9 +116,9 @@ class V2boardInstall extends Command
         return $user->save();
     }
 
-    private function saveToEnv($data = [])
+    private function saveToEnv($data = []): true
     {
-        function set_env_var($key, $value)
+        function set_env_var($key, $value): bool
         {
             if (! is_bool(strpos($value, ' '))) {
                 $value = '"'.$value.'"';

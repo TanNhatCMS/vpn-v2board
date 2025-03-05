@@ -22,7 +22,7 @@ class ResetUser extends Command
      *
      * @var string
      */
-    protected $description = 'Reset all user information';
+    protected $description = 'Đặt lại tất cả thông tin người dùng';
 
     /**
      * Create a new command instance.

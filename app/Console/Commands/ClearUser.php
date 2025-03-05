@@ -34,9 +34,9 @@ class ClearUser extends Command
     /**
      * Execute the console command.
      *
-     * @return mixed
+     * @return void
      */
-    public function handle()
+    public function handle(): void
     {
         $builder = User::where('plan_id', null)
             ->where('transfer_enable', 0)
