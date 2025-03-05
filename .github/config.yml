@@ -1,0 +1,118 @@
+# Configuration for welcome - https://github.com/behaviorbot/welcome
+
+# Configuration for new-issue-welcome - https://github.com/behaviorbot/new-issue-welcome
+
+# Comment to be posted to on first time issues
+newIssueWelcomeComment: >
+  Hello there! Thanks for opening your first issue on this repo!
+
+   - Bug Reports, Feature Requests - GitHub Issues (here);
+
+  Please keep in mind offers no official / paid support. Whatever help you receive here, on Gitter, Slack or Stackoverflow is thanks to our awesome _awesome_ community members, who give up some of their time to help their peers. If you want to join our community, just start pitching in. We take pride in being a welcoming bunch.
+
+
+  Thank you!
+
+
+  --
+
+  Justin Case
+
+  The TanNhatCMS Robot
+
+# Configuration for new-pr-welcome - https://github.com/behaviorbot/new-pr-welcome
+
+# Comment to be posted to on PRs from first time contributors in your repository
+newPRWelcomeComment: >
+  BOOM! Your first PR with us, thank you so much! Someone will take a look at it shortly.
+
+
+  Please keep in mind that:
+    - **if this constitutes a breaking change, it might take quite a while for this to get merged**; we try to emulate the Laravel release cycle as much as possible, so developers can upgrade both software once; this means a new big release every ~6 months;
+    - **even if it's a non-breaking change, it might take a few days/weeks for the PR to get merged**; unless it's a no-brainer, **we like to have some community feedback on new features, before we merge them**; this leads to higher-quality code, in the end; we learnt this the hard way :-)
+    - **not all PRs get merged**; sometimes we just have to hold out new features, to keep the packages lean; sometimes we don't include features that only apply to niche use cases;
+    - **we're not perfect**; if you think we're wrong, call us out on it; but in a kind way :-) we all make mistakes, best we learn from them and build better software together;
+
+
+  Thank you!
+
+
+  --
+
+  Justin Case
+
+  The TanNhatCMS Robot
+
+# Configuration for first-pr-merge - https://github.com/behaviorbot/first-pr-merge
+
+# Comment to be posted to on pull requests merged by a first time user
+firstPRMergeComment: >
+  WHOOP-WHOOP! Congrats, your first PR on this repo has officially been merged.
+
+
+  ![party](https://media1.giphy.com/media/3KC2jD2QcBOSc/giphy.gif "Party!!!")
+
+
+  If you want to help out the community in other ways, you can:
+   - **give your opinion on other GitHub Issues & PRs**;
+
+  Again. Thank you for the PR. You are a wonderful person. Keep 'em coming :-)
+
+  Cheers!
+
+
+  --
+
+  Justin Case
+
+  The TanNhatCMS Robot
+
+# It is recommend to include as many gifs and emojis as possible
+#
+# ---------------------------------------------------------------------------------------------
+#
+# Configuration for request-info - https://github.com/behaviorbot/request-info
+
+# *OPTIONAL* Comment to reply with
+# Can be either a string :
+requestInfoReplyComment: >
+  Hi there!
+
+  Could you please provide us with more info about this? Looks like you skipped the title/body.
+  Thank you!
+
+  --
+
+  Justin Case
+
+  The TanNhatCMS Robot
+
+# Or an array:
+# requestInfoReplyComment:
+#  - Ah no! young blade! That was a trifle short!
+#  - Tell me more !
+#  - I am sure you can be more effusive
+
+
+# *OPTIONAL* default titles to check against for lack of descriptiveness
+# MUST BE ALL LOWERCASE
+requestInfoDefaultTitles:
+  # - update readme.md
+  - updates
+
+# *OPTIONAL* Label to be added to Issues and Pull Requests with insufficient information given
+requestInfoLabelToAdd: needs-more-info
+
+# *OPTIONAL* Only warn about insufficient information on these events type
+# Keys must be lowercase. Valid values are 'issue' and 'pullRequest'
+requestInfoOn:
+  pullRequest: true
+  issue: true
+
+# *OPTIONAL* Add a list of people whose Issues/PRs will not be commented on
+# keys must be GitHub usernames
+requestInfoUserstoExclude:
+  - TanNhatCMS
+
+# ---------------------------------------------------------------------------------------------
+#
