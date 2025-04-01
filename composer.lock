@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a945d01c1e97ff224af543fed8690380",
+    "content-hash": "ff370ba74f67e763578935c26f368dab",
     "packages": [
         {
             "name": "brick/math",
@@ -2762,21 +2762,21 @@
         },
         {
             "name": "php-curl-class/php-curl-class",
-            "version": "11.0.4",
+            "version": "12.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/php-curl-class/php-curl-class.git",
-                "reference": "6162edf0ebe6c9c25733834c357b94a34c67ec3e"
+                "reference": "7a8f05efb18bb865dbce864b8fd34d4f5d920c74"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/php-curl-class/php-curl-class/zipball/6162edf0ebe6c9c25733834c357b94a34c67ec3e",
-                "reference": "6162edf0ebe6c9c25733834c357b94a34c67ec3e",
+                "url": "https://api.github.com/repos/php-curl-class/php-curl-class/zipball/7a8f05efb18bb865dbce864b8fd34d4f5d920c74",
+                "reference": "7a8f05efb18bb865dbce864b8fd34d4f5d920c74",
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
-                "php": ">=7.4"
+                "php": ">=8.0"
             },
             "require-dev": {
                 "dealerdirect/phpcodesniffer-composer-installer": "*",
@@ -2786,8 +2786,7 @@
                 "phpcsstandards/phpcsutils": "@alpha",
                 "phpstan/phpstan": "*",
                 "phpunit/phpunit": "*",
-                "squizlabs/php_codesniffer": "*",
-                "vimeo/psalm": ">=5.26.1"
+                "squizlabs/php_codesniffer": "*"
             },
             "suggest": {
                 "ext-mbstring": "*"
@@ -2837,9 +2836,9 @@
             ],
             "support": {
                 "issues": "https://github.com/php-curl-class/php-curl-class/issues",
-                "source": "https://github.com/php-curl-class/php-curl-class/tree/11.0.4"
+                "source": "https://github.com/php-curl-class/php-curl-class/tree/12.0.0"
             },
-            "time": "2025-02-20T20:42:49+00:00"
+            "time": "2025-03-25T18:04:16+00:00"
         },
         {
             "name": "phpoption/phpoption",
@@ -8518,13 +8517,13 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.2",
         "ext-openssl": "*"
     },
-    "platform-dev": {},
-    "plugin-api-version": "2.6.0"
+    "platform-dev": [],
+    "plugin-api-version": "2.3.0"
 }
