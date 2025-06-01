@@ -18,7 +18,7 @@
         "laravel/tinker": "^2.10.1",
         "linfo/linfo": "^4.0",
         "php-curl-class/php-curl-class": "^11.0",
-        "predis/predis": "^2.3",
+        "predis/predis": "^3.0",
         "stripe/stripe-php": "^16.6"
     },
     "require-dev": {
